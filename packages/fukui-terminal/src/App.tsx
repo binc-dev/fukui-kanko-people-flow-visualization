@@ -1,5 +1,7 @@
 import { MonthRangePicker } from "@/components/parts/month-range-picker";
 import { RangeSelector } from "@/components/parts/range-selector";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -81,6 +83,19 @@ function App() {
   const [endWeekRange, setEndWeekRange] = useState<{ from: Date; to: Date } | undefined>(undefined);
   const [theme, setTheme] = useState<"month" | "week" | "day" | "hour">("month");
 
+  const [compare, setCompare] = useState(false);
+
+  const [startMonth2, setStartMonth2] = useState<Date | undefined>(undefined);
+  const [endMonth2, setEndMonth2] = useState<Date | undefined>(undefined);
+  const [startWeekRange2, setStartWeekRange2] = useState<{ from: Date; to: Date } | undefined>(
+    undefined,
+  );
+  const [endWeekRange2, setEndWeekRange2] = useState<{ from: Date; to: Date } | undefined>(
+    undefined,
+  );
+  const [startDate2, setStartDate2] = useState<Date | undefined>(undefined);
+  const [endDate2, setEndDate2] = useState<Date | undefined>(undefined);
+
   return (
     <>
       <div style={containerStyle}>
@@ -100,6 +115,12 @@ function App() {
               setEndDate(undefined);
               setStartWeekRange(undefined);
               setEndWeekRange(undefined);
+              setStartMonth2(undefined);
+              setEndMonth2(undefined);
+              setStartDate2(undefined);
+              setEndDate2(undefined);
+              setStartWeekRange2(undefined);
+              setEndWeekRange2(undefined);
             }}
           >
             <SelectTrigger className="w-[180px] bg-white text-black">
@@ -112,35 +133,77 @@ function App() {
               <SelectItem value="hour">時間別</SelectItem>
             </SelectContent>
           </Select>
-          {theme === "month" && (
-            <MonthRangePicker
-              startMonth={startMonth}
-              endMonth={endMonth}
-              onChange={(start, end) => {
-                setStartMonth(start);
-                setEndMonth(end);
-              }}
+          <div className="flex items-center gap-3">
+            <Checkbox
+              id="terms"
+              checked={compare}
+              onCheckedChange={(checked) => setCompare(checked === true)}
             />
+            <Label htmlFor="terms">２期間比較</Label>
+          </div>
+          {theme === "month" && (
+            <>
+              <MonthRangePicker
+                startMonth={startMonth}
+                endMonth={endMonth}
+                onChange={(start, end) => {
+                  setStartMonth(start);
+                  setEndMonth(end);
+                }}
+              />
+              {compare && (
+                <MonthRangePicker
+                  startMonth={startMonth2}
+                  endMonth={endMonth2}
+                  onChange={(start, end) => {
+                    setStartMonth2(start);
+                    setEndMonth2(end);
+                  }}
+                />
+              )}
+            </>
           )}
 
           {theme === "week" && (
-            <RangeSelector
-              type="week"
-              start={startWeekRange}
-              end={endWeekRange}
-              setStart={setStartWeekRange}
-              setEnd={setEndWeekRange}
-            />
+            <>
+              <RangeSelector
+                type="week"
+                start={startWeekRange}
+                end={endWeekRange}
+                setStart={setStartWeekRange}
+                setEnd={setEndWeekRange}
+              />
+              {compare && (
+                <RangeSelector
+                  type="week"
+                  start={startWeekRange2}
+                  end={endWeekRange2}
+                  setStart={setStartWeekRange2}
+                  setEnd={setEndWeekRange2}
+                />
+              )}
+            </>
           )}
 
           {(theme === "day" || theme === "hour") && (
-            <RangeSelector
-              type="date"
-              start={startDate}
-              end={endDate}
-              setStart={setStartDate}
-              setEnd={setEndDate}
-            />
+            <>
+              <RangeSelector
+                type="date"
+                start={startDate}
+                end={endDate}
+                setStart={setStartDate}
+                setEnd={setEndDate}
+              />
+              {compare && (
+                <RangeSelector
+                  type="date"
+                  start={startDate2}
+                  end={endDate2}
+                  setStart={setStartDate2}
+                  setEnd={setEndDate2}
+                />
+              )}
+            </>
           )}
           <a
             href={homeUrl}
