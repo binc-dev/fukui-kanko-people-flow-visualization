@@ -103,46 +103,48 @@ function App() {
           <div style={emojiStyle}>🚧</div>
           <h1 style={titleStyle}>福井駅周辺データ可視化</h1>
           <p style={messageStyle}>現在開発中です</p>
-          <Select
-            value={theme}
-            onValueChange={(v) => {
-              const newTheme = v as "month" | "week" | "day" | "hour";
-              setTheme(newTheme);
-              // テーマ変更時に値をリセット
-              setStartMonth(undefined);
-              setEndMonth(undefined);
-              setStartDate(undefined);
-              setEndDate(undefined);
-              setStartWeekRange(undefined);
-              setEndWeekRange(undefined);
-              setStartMonth2(undefined);
-              setEndMonth2(undefined);
-              setStartDate2(undefined);
-              setEndDate2(undefined);
-              setStartWeekRange2(undefined);
-              setEndWeekRange2(undefined);
-            }}
-          >
-            <SelectTrigger className="w-[180px] bg-white text-black">
-              <SelectValue placeholder="Theme" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="month">月別</SelectItem>
-              <SelectItem value="week">週別</SelectItem>
-              <SelectItem value="day">日別</SelectItem>
-              <SelectItem value="hour">時間別</SelectItem>
-            </SelectContent>
-          </Select>
-          <div className="flex items-center gap-3">
-            <Checkbox
-              id="terms"
-              checked={compare}
-              onCheckedChange={(checked) => setCompare(checked === true)}
-            />
-            <Label htmlFor="terms">２期間比較</Label>
+          <div className="flex items-center gap-6 mb-4 justify-center">
+            <Select
+              value={theme}
+              onValueChange={(v) => {
+                const newTheme = v as "month" | "week" | "day" | "hour";
+                setTheme(newTheme);
+                // テーマ変更時に値をリセット
+                setStartMonth(undefined);
+                setEndMonth(undefined);
+                setStartDate(undefined);
+                setEndDate(undefined);
+                setStartWeekRange(undefined);
+                setEndWeekRange(undefined);
+                setStartMonth2(undefined);
+                setEndMonth2(undefined);
+                setStartDate2(undefined);
+                setEndDate2(undefined);
+                setStartWeekRange2(undefined);
+                setEndWeekRange2(undefined);
+              }}
+            >
+              <SelectTrigger className="w-[180px] bg-white text-black">
+                <SelectValue placeholder="Theme" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="month">月別</SelectItem>
+                <SelectItem value="week">週別</SelectItem>
+                <SelectItem value="day">日別</SelectItem>
+                <SelectItem value="hour">時間別</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="terms"
+                checked={compare}
+                onCheckedChange={(checked) => setCompare(checked === true)}
+              />
+              <Label htmlFor="terms">２期間比較</Label>
+            </div>
           </div>
           {theme === "month" && (
-            <>
+            <div className="flex flex-row gap-6 justify-center">
               <MonthRangePicker
                 startMonth={startMonth}
                 endMonth={endMonth}
@@ -161,11 +163,11 @@ function App() {
                   }}
                 />
               )}
-            </>
+            </div>
           )}
 
           {theme === "week" && (
-            <>
+            <div className="flex flex-row gap-6 justify-center">
               <RangeSelector
                 type="week"
                 start={startWeekRange}
@@ -182,11 +184,11 @@ function App() {
                   setEnd={setEndWeekRange2}
                 />
               )}
-            </>
+            </div>
           )}
 
           {(theme === "day" || theme === "hour") && (
-            <>
+            <div className="flex flex-row gap-6 justify-center">
               <RangeSelector
                 type="date"
                 start={startDate}
@@ -203,7 +205,7 @@ function App() {
                   setEnd={setEndDate2}
                 />
               )}
-            </>
+            </div>
           )}
           <a
             href={homeUrl}
