@@ -2,6 +2,8 @@ import { Graph } from "@/components/parts/graph";
 import { LoadingSpinner } from "@/components/parts/loading-spinner";
 import { MonthRangePicker } from "@/components/parts/month-range-picker";
 import { RangeSelector } from "@/components/parts/range-selector";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -165,30 +167,35 @@ function App() {
         <div style={contentStyle}>
           <h1 style={titleStyle}>福井駅周辺データ可視化</h1>
           <div className="flex flex-col items-center gap-6 my-8">
-            <Select
-              value={theme}
-              onValueChange={(v) => {
-                const newTheme = v as "month" | "week" | "day" | "hour";
-                setTheme(newTheme);
-                // テーマ変更時に値をリセット
-                setStartMonth(undefined);
-                setEndMonth(undefined);
-                setStartDate(undefined);
-                setEndDate(undefined);
-                setStartWeekRange(undefined);
-                setEndWeekRange(undefined);
-              }}
-            >
-              <SelectTrigger className="w-[180px] bg-white text-black">
-                <SelectValue placeholder="Theme" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="month">月別</SelectItem>
-                <SelectItem value="week">週別</SelectItem>
-                <SelectItem value="day">日別</SelectItem>
-                <SelectItem value="hour">時間別</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex flex-row items-center gap-4">
+              <p>表示単位</p>
+              <Select
+                value={theme}
+                onValueChange={(v) => {
+                  const newTheme = v as "month" | "week" | "day" | "hour";
+                  setTheme(newTheme);
+                  // テーマ変更時に値をリセット
+                  setStartMonth(undefined);
+                  setEndMonth(undefined);
+                  setStartDate(undefined);
+                  setEndDate(undefined);
+                  setStartWeekRange(undefined);
+                  setEndWeekRange(undefined);
+                }}
+              >
+                <SelectTrigger className="w-[180px] bg-white text-black">
+                  <SelectValue placeholder="Theme" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="month">月別</SelectItem>
+                  <SelectItem value="week">週別</SelectItem>
+                  <SelectItem value="day">日別</SelectItem>
+                  <SelectItem value="hour">時間別</SelectItem>
+                </SelectContent>
+              </Select>
+              <Checkbox />
+              <Label htmlFor="terms">2期間比較</Label>
+            </div>
             {theme === "month" && (
               <MonthRangePicker
                 startMonth={startMonth}
