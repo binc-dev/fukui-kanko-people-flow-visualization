@@ -88,6 +88,7 @@ function App() {
   const [filteredData, setFilteredData] = useState<AggregatedData[]>([]);
   const [filteredDailyData, setFilteredDailyData] = useState<AggregatedData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [compareMode, setCompareMode] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -193,50 +194,107 @@ function App() {
                   <SelectItem value="hour">時間別</SelectItem>
                 </SelectContent>
               </Select>
-              <Checkbox />
+              <Checkbox checked={compareMode} onCheckedChange={(v) => setCompareMode(!!v)} />
               <Label htmlFor="terms">2期間比較</Label>
             </div>
-            {theme === "month" && (
-              <MonthRangePicker
-                startMonth={startMonth}
-                endMonth={endMonth}
-                onChange={(start, end) => {
-                  setStartMonth(start);
-                  setEndMonth(end);
-                }}
-              />
-            )}
+            <div className="flex flex-row gap-8 justify-center">
+              <div>
+                {theme === "month" && (
+                  <MonthRangePicker
+                    startMonth={startMonth}
+                    endMonth={endMonth}
+                    onChange={(start, end) => {
+                      setStartMonth(start);
+                      setEndMonth(end);
+                    }}
+                  />
+                )}
 
-            {theme === "week" && (
-              <RangeSelector
-                type="week"
-                start={startWeekRange}
-                end={endWeekRange}
-                setStart={setStartWeekRange}
-                setEnd={setEndWeekRange}
-              />
-            )}
+                {theme === "week" && (
+                  <RangeSelector
+                    type="week"
+                    start={startWeekRange}
+                    end={endWeekRange}
+                    setStart={setStartWeekRange}
+                    setEnd={setEndWeekRange}
+                  />
+                )}
 
-            {(theme === "day" || theme === "hour") && (
-              <RangeSelector
-                type="date"
-                start={startDate}
-                end={endDate}
-                setStart={setStartDate}
-                setEnd={setEndDate}
-              />
-            )}
-          </div>
-          <div style={{ margin: "2rem 0" }}>
-            {isLoading && theme === "hour" ? (
-              <LoadingSpinner />
-            ) : (startMonth && endMonth) ||
-              (startWeekRange && endWeekRange) ||
-              (startDate && endDate) ? (
-              <Graph theme={theme} data={theme === "hour" ? filteredDailyData : filteredData} />
-            ) : (
-              <p>範囲を選択してください。</p>
-            )}
+                {(theme === "day" || theme === "hour") && (
+                  <RangeSelector
+                    type="date"
+                    start={startDate}
+                    end={endDate}
+                    setStart={setStartDate}
+                    setEnd={setEndDate}
+                  />
+                )}
+
+                <div style={{ margin: "2rem 0" }}>
+                  {isLoading && theme === "hour" ? (
+                    <LoadingSpinner />
+                  ) : (startMonth && endMonth) ||
+                    (startWeekRange && endWeekRange) ||
+                    (startDate && endDate) ? (
+                    <Graph
+                      theme={theme}
+                      data={theme === "hour" ? filteredDailyData : filteredData}
+                    />
+                  ) : (
+                    <p>範囲を選択してください。</p>
+                  )}
+                </div>
+              </div>
+              {compareMode && (
+                <div>
+                  {theme === "month" && (
+                    <MonthRangePicker
+                      startMonth={startMonth}
+                      endMonth={endMonth}
+                      onChange={(start, end) => {
+                        setStartMonth(start);
+                        setEndMonth(end);
+                      }}
+                    />
+                  )}
+
+                  {theme === "week" && (
+                    <RangeSelector
+                      type="week"
+                      start={startWeekRange}
+                      end={endWeekRange}
+                      setStart={setStartWeekRange}
+                      setEnd={setEndWeekRange}
+                    />
+                  )}
+
+                  {(theme === "day" || theme === "hour") && (
+                    <RangeSelector
+                      type="date"
+                      start={startDate}
+                      end={endDate}
+                      setStart={setStartDate}
+                      setEnd={setEndDate}
+                    />
+                  )}
+
+                  <div style={{ margin: "2rem 0" }}>
+                    {isLoading && theme === "hour" ? (
+                      <LoadingSpinner />
+                    ) : (startMonth && endMonth) ||
+                      (startWeekRange && endWeekRange) ||
+                      (startDate && endDate) ? (
+                      <Graph
+                        theme={theme}
+                        data={theme === "hour" ? filteredDailyData : filteredData}
+                      />
+                    ) : (
+                      <p>範囲を選択してください。</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           <a
             href={homeUrl}
