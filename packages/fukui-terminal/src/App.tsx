@@ -1,7 +1,3 @@
-import { Graph } from "@/components/parts/graph";
-import { LoadingSpinner } from "@/components/parts/loading-spinner";
-import { MonthRangePicker } from "@/components/parts/month-range-picker";
-import { RangeSelector } from "@/components/parts/range-selector";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
@@ -20,6 +16,7 @@ import {
 } from "@/lib/aggregation";
 import { getDailyData, getData } from "@/lib/data/csv";
 import { useEffect, useState } from "react";
+import { PeriodGraphPanel } from "./components/parts/period-graph-panel";
 
 function App() {
   useEffect(() => {
@@ -74,6 +71,12 @@ function App() {
     cursor: "pointer",
   };
 
+  const [theme, setTheme] = useState<"month" | "week" | "day" | "hour">("month");
+  const [csvData, setCsvData] = useState<AggregatedData[]>([]);
+  const [csvDailyData, setCsvDailyData] = useState<AggregatedData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [compareMode, setCompareMode] = useState(false);
+
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [startMonth, setStartMonth] = useState<Date | undefined>(undefined);
@@ -82,13 +85,21 @@ function App() {
     undefined,
   );
   const [endWeekRange, setEndWeekRange] = useState<{ from: Date; to: Date } | undefined>(undefined);
-  const [theme, setTheme] = useState<"month" | "week" | "day" | "hour">("month");
-  const [csvData, setCsvData] = useState<AggregatedData[]>([]);
-  const [csvDailyData, setCsvDailyData] = useState<AggregatedData[]>([]);
   const [filteredData, setFilteredData] = useState<AggregatedData[]>([]);
   const [filteredDailyData, setFilteredDailyData] = useState<AggregatedData[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [compareMode, setCompareMode] = useState(false);
+
+  const [compareStartDate, setCompareStartDate] = useState<Date | undefined>(undefined);
+  const [compareEndDate, setCompareEndDate] = useState<Date | undefined>(undefined);
+  const [compareStartMonth, setCompareStartMonth] = useState<Date | undefined>(undefined);
+  const [compareEndMonth, setCompareEndMonth] = useState<Date | undefined>(undefined);
+  const [compareStartWeekRange, setCompareStartWeekRange] = useState<
+    { from: Date; to: Date } | undefined
+  >(undefined);
+  const [compareEndWeekRange, setCompareEndWeekRange] = useState<
+    { from: Date; to: Date } | undefined
+  >(undefined);
+  const [compareFilteredData, setCompareFilteredData] = useState<AggregatedData[]>([]);
+  const [compareFilteredDailyData, setCompareFilteredDailyData] = useState<AggregatedData[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -162,6 +173,38 @@ function App() {
     csvDailyData,
   ]);
 
+  useEffect(() => {
+    if (theme === "month" && compareStartMonth && compareEndMonth) {
+      const end = new Date(compareEndMonth.getFullYear(), compareEndMonth.getMonth() + 1, 0);
+      setCompareFilteredData(aggregateMonthly(csvData, compareStartMonth, end));
+      return;
+    }
+    if (theme === "week" && compareStartWeekRange && compareEndWeekRange) {
+      setCompareFilteredData(aggregateWeekly(csvData, compareStartWeekRange, compareEndWeekRange));
+      return;
+    }
+    if (theme === "day" && compareStartDate && compareEndDate) {
+      setCompareFilteredData(aggregateDaily(csvData, compareStartDate, compareEndDate));
+      return;
+    }
+    if (theme === "hour" && compareStartDate && compareEndDate) {
+      setCompareFilteredDailyData(aggregateHourly(csvDailyData));
+      return;
+    }
+    setCompareFilteredData(csvData);
+    setCompareFilteredDailyData(csvDailyData);
+  }, [
+    theme,
+    compareStartMonth,
+    compareEndMonth,
+    compareStartWeekRange,
+    compareEndWeekRange,
+    compareStartDate,
+    compareEndDate,
+    csvData,
+    csvDailyData,
+  ]);
+
   return (
     <>
       <div style={containerStyle}>
@@ -198,101 +241,43 @@ function App() {
               <Label htmlFor="terms">2期間比較</Label>
             </div>
             <div className="flex flex-row gap-8 justify-center">
-              <div>
-                {theme === "month" && (
-                  <MonthRangePicker
-                    startMonth={startMonth}
-                    endMonth={endMonth}
-                    onChange={(start, end) => {
-                      setStartMonth(start);
-                      setEndMonth(end);
-                    }}
-                  />
-                )}
-
-                {theme === "week" && (
-                  <RangeSelector
-                    type="week"
-                    start={startWeekRange}
-                    end={endWeekRange}
-                    setStart={setStartWeekRange}
-                    setEnd={setEndWeekRange}
-                  />
-                )}
-
-                {(theme === "day" || theme === "hour") && (
-                  <RangeSelector
-                    type="date"
-                    start={startDate}
-                    end={endDate}
-                    setStart={setStartDate}
-                    setEnd={setEndDate}
-                  />
-                )}
-
-                <div style={{ margin: "2rem 0" }}>
-                  {isLoading && theme === "hour" ? (
-                    <LoadingSpinner />
-                  ) : (startMonth && endMonth) ||
-                    (startWeekRange && endWeekRange) ||
-                    (startDate && endDate) ? (
-                    <Graph
-                      theme={theme}
-                      data={theme === "hour" ? filteredDailyData : filteredData}
-                    />
-                  ) : (
-                    <p>範囲を選択してください。</p>
-                  )}
-                </div>
-              </div>
+              <PeriodGraphPanel
+                theme={theme}
+                startMonth={startMonth}
+                endMonth={endMonth}
+                setStartMonth={setStartMonth}
+                setEndMonth={setEndMonth}
+                startWeekRange={startWeekRange}
+                endWeekRange={endWeekRange}
+                setStartWeekRange={setStartWeekRange}
+                setEndWeekRange={setEndWeekRange}
+                startDate={startDate}
+                endDate={endDate}
+                setStartDate={setStartDate}
+                setEndDate={setEndDate}
+                isLoading={isLoading}
+                filteredData={filteredData}
+                filteredDailyData={filteredDailyData}
+              />
               {compareMode && (
-                <div>
-                  {theme === "month" && (
-                    <MonthRangePicker
-                      startMonth={startMonth}
-                      endMonth={endMonth}
-                      onChange={(start, end) => {
-                        setStartMonth(start);
-                        setEndMonth(end);
-                      }}
-                    />
-                  )}
-
-                  {theme === "week" && (
-                    <RangeSelector
-                      type="week"
-                      start={startWeekRange}
-                      end={endWeekRange}
-                      setStart={setStartWeekRange}
-                      setEnd={setEndWeekRange}
-                    />
-                  )}
-
-                  {(theme === "day" || theme === "hour") && (
-                    <RangeSelector
-                      type="date"
-                      start={startDate}
-                      end={endDate}
-                      setStart={setStartDate}
-                      setEnd={setEndDate}
-                    />
-                  )}
-
-                  <div style={{ margin: "2rem 0" }}>
-                    {isLoading && theme === "hour" ? (
-                      <LoadingSpinner />
-                    ) : (startMonth && endMonth) ||
-                      (startWeekRange && endWeekRange) ||
-                      (startDate && endDate) ? (
-                      <Graph
-                        theme={theme}
-                        data={theme === "hour" ? filteredDailyData : filteredData}
-                      />
-                    ) : (
-                      <p>範囲を選択してください。</p>
-                    )}
-                  </div>
-                </div>
+                <PeriodGraphPanel
+                  theme={theme}
+                  startMonth={compareStartMonth}
+                  endMonth={compareEndMonth}
+                  setStartMonth={setCompareStartMonth}
+                  setEndMonth={setCompareEndMonth}
+                  startWeekRange={compareStartWeekRange}
+                  endWeekRange={compareEndWeekRange}
+                  setStartWeekRange={setCompareStartWeekRange}
+                  setEndWeekRange={setCompareEndWeekRange}
+                  startDate={compareStartDate}
+                  endDate={compareEndDate}
+                  setStartDate={setCompareStartDate}
+                  setEndDate={setCompareEndDate}
+                  isLoading={isLoading}
+                  filteredData={compareFilteredData}
+                  filteredDailyData={compareFilteredDailyData}
+                />
               )}
             </div>
           </div>
