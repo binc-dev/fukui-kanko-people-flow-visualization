@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/select";
 import { AggregatedData } from "@/interfaces/aggregated-data.interface";
 import { Period } from "@/interfaces/period.interface";
-import { getFilteredData } from "@/lib/aggregation";
-import { getDailyData, getData } from "@/lib/data/csv";
+import { getData } from "@/lib/data/csv";
+import { useDailyDataEffect, useFilteredData } from "@/lib/hooks/period-data-effects";
 import { useEffect, useState } from "react";
 import { PeriodGraphPanel } from "./components/parts/period-graph-panel";
 
@@ -107,89 +107,24 @@ function App() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (theme !== "hour") {
-      setIsLoading(false);
-      return;
-    }
-    let isCurrent = true;
-    const fetchData = async () => {
-      if (period.startDate && period.endDate) {
-        setIsLoading(true);
-        const rawData = await getDailyData("Person", period.startDate, period.endDate);
-        if (isCurrent) {
-          setCsvDailyData(rawData);
-          setIsLoading(false);
-        }
-      }
-    };
-    fetchData();
-
-    return () => {
-      isCurrent = false;
-    };
-  }, [theme, period.startDate, period.endDate]);
-
-  useEffect(() => {
-    if (theme !== "hour") {
-      setCompareIsLoading(false);
-      return;
-    }
-    let isCurrent = true;
-    const fetchData = async () => {
-      if (comparePeriod.startDate && comparePeriod.endDate) {
-        setCompareIsLoading(true);
-        const rawData = await getDailyData(
-          "Person",
-          comparePeriod.startDate,
-          comparePeriod.endDate,
-        );
-        if (isCurrent) {
-          setCompareCsvDailyData(rawData);
-          setCompareIsLoading(false);
-        }
-      }
-    };
-    fetchData();
-
-    return () => {
-      isCurrent = false;
-    };
-  }, [theme, comparePeriod.startDate, comparePeriod.endDate]);
-
   // 本期間の集計データを期間・テーマ・データ変更時に再計算
-  useEffect(() => {
-    const { data, daily } = getFilteredData(theme, period, csvData, csvDailyData);
-    if (data !== undefined) setFilteredData(data);
-    if (daily !== undefined) setFilteredDailyData(daily);
-  }, [
-    theme,
-    period.startMonth,
-    period.endMonth,
-    period.startWeekRange,
-    period.endWeekRange,
-    period.startDate,
-    period.endDate,
-    csvData,
-    csvDailyData,
-  ]);
+  useFilteredData(theme, period, csvData, csvDailyData, setFilteredData, setFilteredDailyData);
 
   // 比較期間の集計データを期間・テーマ・データ変更時に再計算
-  useEffect(() => {
-    const { data, daily } = getFilteredData(theme, comparePeriod, csvData, compareCsvDailyData);
-    if (data !== undefined) setCompareFilteredData(data);
-    if (daily !== undefined) setCompareFilteredDailyData(daily);
-  }, [
+  useFilteredData(
     theme,
-    comparePeriod.startMonth,
-    comparePeriod.endMonth,
-    comparePeriod.startWeekRange,
-    comparePeriod.endWeekRange,
-    comparePeriod.startDate,
-    comparePeriod.endDate,
+    comparePeriod,
     csvData,
     compareCsvDailyData,
-  ]);
+    setCompareFilteredData,
+    setCompareFilteredDailyData,
+  );
+
+  // 本期間の時間別データを取得・更新
+  useDailyDataEffect(theme, period, setCsvDailyData, setIsLoading);
+
+  // 比較期間の時間別データを取得・更新
+  useDailyDataEffect(theme, comparePeriod, setCompareCsvDailyData, setCompareIsLoading);
 
   return (
     <div style={containerStyle}>
