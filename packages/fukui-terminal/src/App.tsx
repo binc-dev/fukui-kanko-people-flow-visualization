@@ -72,6 +72,7 @@ function App() {
   const [csvDailyData, setCsvDailyData] = useState<AggregatedData[]>([]);
   const [compareCsvDailyData, setCompareCsvDailyData] = useState<AggregatedData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [compareIsLoading, setCompareIsLoading] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
 
   // 本期間の状態
@@ -131,13 +132,13 @@ function App() {
 
   useEffect(() => {
     if (theme !== "hour") {
-      setIsLoading(false);
+      setCompareIsLoading(false);
       return;
     }
     let isCurrent = true;
     const fetchData = async () => {
       if (comparePeriod.startDate && comparePeriod.endDate) {
-        setIsLoading(true);
+        setCompareIsLoading(true);
         const rawData = await getDailyData(
           "Person",
           comparePeriod.startDate,
@@ -145,7 +146,7 @@ function App() {
         );
         if (isCurrent) {
           setCompareCsvDailyData(rawData);
-          setIsLoading(false);
+          setCompareIsLoading(false);
         }
       }
     };
@@ -252,7 +253,7 @@ function App() {
                 theme={theme}
                 period={comparePeriod}
                 setPeriod={setComparePeriod}
-                isLoading={isLoading}
+                isLoading={compareIsLoading}
                 filteredData={compareFilteredData}
                 filteredDailyData={compareFilteredDailyData}
               />
