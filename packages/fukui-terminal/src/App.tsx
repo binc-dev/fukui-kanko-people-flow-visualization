@@ -15,58 +15,6 @@ import { useEffect, useState } from "react";
 import { PeriodGraphPanel } from "./components/parts/period-graph-panel";
 
 function App() {
-  useEffect(() => {
-    // bodyとhtmlのマージン・パディングをリセット
-    document.body.style.margin = "0";
-    document.body.style.padding = "0";
-    document.documentElement.style.margin = "0";
-    document.documentElement.style.padding = "0";
-  }, []);
-
-  // 開発環境かどうかを判定
-  const isDev = import.meta.env.DEV;
-  // ローカル開発時はランディングページのポート、本番時は相対パス
-  const homeUrl = isDev ? "http://localhost:3004" : "../";
-
-  const containerStyle = {
-    minHeight: "100vh",
-    width: "100vw",
-    background: "linear-gradient(to bottom right, #dbeafe, #e0e7ff)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontFamily: "Arial, sans-serif",
-    margin: 0,
-    padding: 0,
-    boxSizing: "border-box" as const,
-  };
-
-  const contentStyle = {
-    textAlign: "center" as const,
-    padding: "2rem",
-    maxWidth: "1600px", // 追加: コンテンツの最大幅を広げる
-    width: "70%", // 追加: 幅いっぱいに広げる
-  };
-
-  const titleStyle = {
-    fontSize: "2.5rem",
-    fontWeight: "bold",
-    color: "#1f2937",
-    marginBottom: "1rem",
-  };
-
-  const buttonStyle = {
-    display: "inline-block",
-    backgroundColor: "#10b981",
-    color: "white",
-    padding: "0.75rem 1.5rem",
-    borderRadius: "0.375rem",
-    textDecoration: "none",
-    transition: "background-color 0.2s",
-    border: "none",
-    cursor: "pointer",
-  };
-
   const [theme, setTheme] = useState<"month" | "week" | "day" | "hour">("month");
   const [csvData, setCsvData] = useState<AggregatedData[]>([]);
   const [csvDailyData, setCsvDailyData] = useState<AggregatedData[]>([]);
@@ -127,10 +75,9 @@ function App() {
   useDailyDataEffect(theme, comparePeriod, setCompareCsvDailyData, setCompareIsLoading);
 
   return (
-    <div style={containerStyle}>
-      <div style={contentStyle}>
-        <h1 style={titleStyle}>福井駅周辺データ可視化</h1>
-        <div className="flex flex-col items-center gap-6 my-8">
+    <div className="h-full w-full max-w-full">
+      <div className="text-center w-full h-full">
+        <div className="flex flex-col items-center gap-2 mt-3">
           <div className="flex flex-row items-center gap-4">
             <p>表示単位</p>
             <Select
@@ -174,7 +121,7 @@ function App() {
             />
             <Label htmlFor="terms">2期間比較</Label>
           </div>
-          <div className="flex flex-row gap-8 justify-center">
+          <div className="flex flex-row w-full gap-8 justify-center">
             <PeriodGraphPanel
               theme={theme}
               period={period}
@@ -195,14 +142,6 @@ function App() {
             )}
           </div>
         </div>
-        <a
-          href={homeUrl}
-          style={buttonStyle}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#059669")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#10b981")}
-        >
-          ← トップページに戻る
-        </a>
       </div>
     </div>
   );

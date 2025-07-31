@@ -23,7 +23,7 @@ export function PeriodGraphPanel({
   filteredDailyData,
 }: PeriodGraphPanelProps) {
   return (
-    <div>
+    <div className="w-full flex flex-col items-center">
       {theme === "month" && (
         <MonthRangePicker
           startMonth={period.startMonth}
@@ -54,7 +54,7 @@ export function PeriodGraphPanel({
         />
       )}
 
-      <div style={{ margin: "2rem 0" }}>
+      <div className="w-2/3">
         {isLoading && theme === "hour" ? (
           <LoadingSpinner />
         ) : (period.startMonth && period.endMonth) ||

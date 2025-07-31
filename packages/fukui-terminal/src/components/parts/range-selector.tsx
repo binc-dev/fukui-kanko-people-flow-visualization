@@ -94,7 +94,7 @@ export const RangeSelector = (props: Props) => {
   }, [props.start]);
 
   return (
-    <div className="flex flex-row gap-6 mb-6">
+    <div className="flex flex-row gap-6">
       <div className="flex flex-col gap-3">
         <Label className="px-1">開始</Label>
         <Popover open={openStart} onOpenChange={setOpenStart}>
