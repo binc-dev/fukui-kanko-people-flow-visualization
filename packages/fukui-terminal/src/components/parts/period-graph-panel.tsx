@@ -3,85 +3,63 @@ import { LoadingSpinner } from "@/components/parts/loading-spinner";
 import { MonthRangePicker } from "@/components/parts/month-range-picker";
 import { RangeSelector } from "@/components/parts/range-selector";
 import { AggregatedData } from "@/interfaces/aggregated-data.interface";
+import { Period } from "@/interfaces/period.interface";
 
-type Props = {
+type PeriodGraphPanelProps = {
   theme: "month" | "week" | "day" | "hour";
-  startMonth?: Date;
-  endMonth?: Date;
-  setStartMonth?: (date?: Date) => void;
-  setEndMonth?: (date?: Date) => void;
-  startWeekRange?: { from: Date; to: Date };
-  endWeekRange?: { from: Date; to: Date };
-  setStartWeekRange?: (range?: { from: Date; to: Date }) => void;
-  setEndWeekRange?: (range?: { from: Date; to: Date }) => void;
-  startDate?: Date;
-  endDate?: Date;
-  setStartDate?: (date?: Date) => void;
-  setEndDate?: (date?: Date) => void;
+  period: Period;
+  setPeriod: React.Dispatch<React.SetStateAction<Period>>;
   isLoading: boolean;
   filteredData: AggregatedData[];
   filteredDailyData: AggregatedData[];
 };
 
-export function PeriodGraphPanel(props: Props) {
-  const {
-    theme,
-    startMonth,
-    endMonth,
-    setStartMonth,
-    setEndMonth,
-    startWeekRange,
-    endWeekRange,
-    setStartWeekRange,
-    setEndWeekRange,
-    startDate,
-    endDate,
-    setStartDate,
-    setEndDate,
-    isLoading,
-    filteredData,
-    filteredDailyData,
-  } = props;
-
+export function PeriodGraphPanel({
+  theme,
+  period,
+  setPeriod,
+  isLoading,
+  filteredData,
+  filteredDailyData,
+}: PeriodGraphPanelProps) {
   return (
     <div>
-      {theme === "month" && setStartMonth && setEndMonth && (
+      {theme === "month" && (
         <MonthRangePicker
-          startMonth={startMonth}
-          endMonth={endMonth}
+          startMonth={period.startMonth}
+          endMonth={period.endMonth}
           onChange={(start, end) => {
-            setStartMonth(start);
-            setEndMonth(end);
+            setPeriod((prev) => ({ ...prev, startMonth: start, endMonth: end }));
           }}
         />
       )}
 
-      {theme === "week" && setStartWeekRange && setEndWeekRange && (
+      {theme === "week" && (
         <RangeSelector
           type="week"
-          start={startWeekRange}
-          end={endWeekRange}
-          setStart={setStartWeekRange}
-          setEnd={setEndWeekRange}
+          start={period.startWeekRange}
+          end={period.endWeekRange}
+          setStart={(range) => setPeriod((prev) => ({ ...prev, startWeekRange: range }))}
+          setEnd={(range) => setPeriod((prev) => ({ ...prev, endWeekRange: range }))}
         />
       )}
 
-      {(theme === "day" || theme === "hour") && setStartDate && setEndDate && (
+      {(theme === "day" || theme === "hour") && (
         <RangeSelector
           type="date"
-          start={startDate}
-          end={endDate}
-          setStart={setStartDate}
-          setEnd={setEndDate}
+          start={period.startDate}
+          end={period.endDate}
+          setStart={(date) => setPeriod((prev) => ({ ...prev, startDate: date }))}
+          setEnd={(date) => setPeriod((prev) => ({ ...prev, endDate: date }))}
         />
       )}
 
       <div style={{ margin: "2rem 0" }}>
         {isLoading && theme === "hour" ? (
           <LoadingSpinner />
-        ) : (startMonth && endMonth) ||
-          (startWeekRange && endWeekRange) ||
-          (startDate && endDate) ? (
+        ) : (period.startMonth && period.endMonth) ||
+          (period.startWeekRange && period.endWeekRange) ||
+          (period.startDate && period.endDate) ? (
           <Graph theme={theme} data={theme === "hour" ? filteredDailyData : filteredData} />
         ) : (
           <p>範囲を選択してください。</p>
