@@ -45,6 +45,9 @@ importers:
       "@holiday-jp/holiday_jp":
         specifier: ^2.4.0
         version: 2.5.1
+      "@primer/octicons-react":
+        specifier: ^19.14.0
+        version: 19.15.3(react@18.3.1)
       "@radix-ui/react-checkbox":
         specifier: ^1.1.3
         version: 1.3.2(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
