@@ -183,6 +183,14 @@ function App() {
                   startWeekRange: undefined,
                   endWeekRange: undefined,
                 });
+                setComparePeriod({
+                  startDate: undefined,
+                  endDate: undefined,
+                  startMonth: undefined,
+                  endMonth: undefined,
+                  startWeekRange: undefined,
+                  endWeekRange: undefined,
+                });
               }}
             >
               <SelectTrigger className="w-[180px] bg-white text-black">
