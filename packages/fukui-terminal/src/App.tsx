@@ -203,7 +203,11 @@ function App() {
                 <SelectItem value="hour">時間別</SelectItem>
               </SelectContent>
             </Select>
-            <Checkbox checked={compareMode} onCheckedChange={(v) => setCompareMode(!!v)} />
+            <Checkbox
+              checked={compareMode}
+              onCheckedChange={(v) => setCompareMode(!!v)}
+              className="bg-white"
+            />
             <Label htmlFor="terms">2期間比較</Label>
           </div>
           <div className="flex flex-row gap-8 justify-center">
