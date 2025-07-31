@@ -70,6 +70,7 @@ function App() {
   const [theme, setTheme] = useState<"month" | "week" | "day" | "hour">("month");
   const [csvData, setCsvData] = useState<AggregatedData[]>([]);
   const [csvDailyData, setCsvDailyData] = useState<AggregatedData[]>([]);
+  const [compareCsvDailyData, setCompareCsvDailyData] = useState<AggregatedData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
 
@@ -128,6 +129,33 @@ function App() {
     };
   }, [theme, period.startDate, period.endDate]);
 
+  useEffect(() => {
+    if (theme !== "hour") {
+      setIsLoading(false);
+      return;
+    }
+    let isCurrent = true;
+    const fetchData = async () => {
+      if (comparePeriod.startDate && comparePeriod.endDate) {
+        setIsLoading(true);
+        const rawData = await getDailyData(
+          "Person",
+          comparePeriod.startDate,
+          comparePeriod.endDate,
+        );
+        if (isCurrent) {
+          setCompareCsvDailyData(rawData);
+          setIsLoading(false);
+        }
+      }
+    };
+    fetchData();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [theme, comparePeriod.startDate, comparePeriod.endDate]);
+
   // 本期間の集計データを期間・テーマ・データ変更時に再計算
   useEffect(() => {
     const { data, daily } = getFilteredData(theme, period, csvData, csvDailyData);
@@ -147,7 +175,7 @@ function App() {
 
   // 比較期間の集計データを期間・テーマ・データ変更時に再計算
   useEffect(() => {
-    const { data, daily } = getFilteredData(theme, comparePeriod, csvData, csvDailyData);
+    const { data, daily } = getFilteredData(theme, comparePeriod, csvData, compareCsvDailyData);
     if (data !== undefined) setCompareFilteredData(data);
     if (daily !== undefined) setCompareFilteredDailyData(daily);
   }, [
@@ -159,7 +187,7 @@ function App() {
     comparePeriod.startDate,
     comparePeriod.endDate,
     csvData,
-    csvDailyData,
+    compareCsvDailyData,
   ]);
 
   return (
