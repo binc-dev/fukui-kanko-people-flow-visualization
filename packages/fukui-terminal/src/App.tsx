@@ -75,73 +75,75 @@ function App() {
   useDailyDataEffect(theme, comparePeriod, setCompareCsvDailyData, setCompareIsLoading);
 
   return (
-    <div className="h-full w-full max-w-full">
-      <div className="text-center w-full h-full">
-        <div className="flex flex-col items-center gap-2 mt-3">
-          <div className="flex flex-row items-center gap-4">
-            <p>表示単位</p>
-            <Select
-              value={theme}
-              onValueChange={(v) => {
-                const newTheme = v as "month" | "week" | "day" | "hour";
-                setTheme(newTheme);
-                // テーマ変更時に値をリセット
-                setPeriod({
-                  startDate: undefined,
-                  endDate: undefined,
-                  startMonth: undefined,
-                  endMonth: undefined,
-                  startWeekRange: undefined,
-                  endWeekRange: undefined,
-                });
-                setComparePeriod({
-                  startDate: undefined,
-                  endDate: undefined,
-                  startMonth: undefined,
-                  endMonth: undefined,
-                  startWeekRange: undefined,
-                  endWeekRange: undefined,
-                });
-              }}
-            >
-              <SelectTrigger className="w-[180px] bg-white text-black">
-                <SelectValue placeholder="Theme" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="month">月別</SelectItem>
-                <SelectItem value="week">週別</SelectItem>
-                <SelectItem value="day">日別</SelectItem>
-                <SelectItem value="hour">時間別</SelectItem>
-              </SelectContent>
-            </Select>
-            <Checkbox
-              checked={compareMode}
-              onCheckedChange={(v) => setCompareMode(!!v)}
-              className="bg-white"
-            />
-            <Label htmlFor="terms">2期間比較</Label>
-          </div>
-          <div className="flex flex-row w-full gap-8 justify-center">
-            <PeriodGraphPanel
-              theme={theme}
-              period={period}
-              setPeriod={setPeriod}
-              isLoading={isLoading}
-              filteredData={filteredData}
-              filteredDailyData={filteredDailyData}
-            />
-            {compareMode && (
-              <PeriodGraphPanel
-                theme={theme}
-                period={comparePeriod}
-                setPeriod={setComparePeriod}
-                isLoading={compareIsLoading}
-                filteredData={compareFilteredData}
-                filteredDailyData={compareFilteredDailyData}
-              />
-            )}
-          </div>
+    <div className="h-full w-full max-w-full text-center flex flex-col items-center gap-2 mt-3">
+      <div className="flex flex-row items-center gap-17 mr-24">
+        <div className="flex flex-row items-center gap-2">
+          <p>表示単位</p>
+          <Select
+            value={theme}
+            onValueChange={(v) => {
+              const newTheme = v as "month" | "week" | "day" | "hour";
+              setTheme(newTheme);
+              // テーマ変更時に値をリセット
+              setPeriod({
+                startDate: undefined,
+                endDate: undefined,
+                startMonth: undefined,
+                endMonth: undefined,
+                startWeekRange: undefined,
+                endWeekRange: undefined,
+              });
+              setComparePeriod({
+                startDate: undefined,
+                endDate: undefined,
+                startMonth: undefined,
+                endMonth: undefined,
+                startWeekRange: undefined,
+                endWeekRange: undefined,
+              });
+            }}
+          >
+            <SelectTrigger className="w-[120px] bg-white text-black">
+              <SelectValue placeholder="Theme" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="month">月別</SelectItem>
+              <SelectItem value="week">週別</SelectItem>
+              <SelectItem value="day">日別</SelectItem>
+              <SelectItem value="hour">時間別</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+        <div className="flex flex-row items-center gap-2">
+          <Checkbox
+            checked={compareMode}
+            onCheckedChange={(v) => setCompareMode(!!v)}
+            className="bg-white"
+          />
+          <Label htmlFor="terms" className="text-base">
+            2期間比較
+          </Label>
+        </div>
+      </div>
+      <div className="flex flex-row w-full gap-8 justify-center">
+        <PeriodGraphPanel
+          theme={theme}
+          period={period}
+          setPeriod={setPeriod}
+          isLoading={isLoading}
+          filteredData={filteredData}
+          filteredDailyData={filteredDailyData}
+        />
+        {compareMode && (
+          <PeriodGraphPanel
+            theme={theme}
+            period={comparePeriod}
+            setPeriod={setComparePeriod}
+            isLoading={compareIsLoading}
+            filteredData={compareFilteredData}
+            filteredDailyData={compareFilteredDailyData}
+          />
+        )}
       </div>
     </div>
   );
