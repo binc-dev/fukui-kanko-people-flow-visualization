@@ -141,7 +141,7 @@ const Graph: React.FC<GraphProps> = ({
     return (
       <ChartContainer config={chartConfig}>
         <LineChart data={data} margin={{ top: 10, right: 40 }}>
-          <Line dataKey={yKey} strokeWidth={3} />
+          <Line dataKey={yKey} strokeWidth={3} stroke="#2563eb" />
           <CartesianGrid />
           <XAxis
             dataKey={xKey}
