@@ -116,7 +116,7 @@ const Graph: React.FC<GraphProps> = ({
               dataKey={`${date}_${yKey}`}
               name={date}
               stroke={lineColors[idx % lineColors.length]}
-              strokeWidth={3}
+              strokeWidth={2}
             />
           ))}
           <CartesianGrid />
