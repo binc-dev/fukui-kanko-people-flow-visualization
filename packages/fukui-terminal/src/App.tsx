@@ -130,6 +130,7 @@ function App() {
           theme={theme}
           period={period}
           setPeriod={setPeriod}
+          isCompareMode={compareMode}
           isLoading={isLoading}
           filteredData={filteredData}
           filteredDailyData={filteredDailyData}
@@ -139,6 +140,7 @@ function App() {
             theme={theme}
             period={comparePeriod}
             setPeriod={setComparePeriod}
+            isCompareMode={compareMode}
             isLoading={compareIsLoading}
             filteredData={compareFilteredData}
             filteredDailyData={compareFilteredDailyData}

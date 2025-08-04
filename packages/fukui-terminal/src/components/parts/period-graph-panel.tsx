@@ -11,6 +11,7 @@ type PeriodGraphPanelProps = {
   theme: "month" | "week" | "day" | "hour";
   period: Period;
   setPeriod: React.Dispatch<React.SetStateAction<Period>>;
+  isCompareMode: boolean;
   isLoading: boolean;
   filteredData: AggregatedData[];
   filteredDailyData: AggregatedData[];
@@ -20,6 +21,7 @@ export function PeriodGraphPanel({
   theme,
   period,
   setPeriod,
+  isCompareMode,
   isLoading,
   filteredData,
   filteredDailyData,
@@ -58,13 +60,13 @@ export function PeriodGraphPanel({
 
       <div className="w-full flex flex-col items-center justify-end min-h-[400px]">
         <Card
-          className={
+          className={`${
             (period.startMonth && period.endMonth) ||
             (period.startWeekRange && period.endWeekRange) ||
             (period.startDate && period.endDate)
-              ? "w-2/3 min-h-[500px] pt-4 pb-0 mt-2"
-              : "w-2/3 min-h-[200px]"
-          }
+              ? "min-h-[500px] pt-4 pb-0 mt-2"
+              : "min-h-[200px]"
+          } ${isCompareMode ? "w-full" : "w-2/3"}`}
         >
           {isLoading && theme === "hour" ? (
             <LoadingSpinner />
