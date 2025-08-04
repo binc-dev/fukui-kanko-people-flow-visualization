@@ -116,6 +116,7 @@ const Graph: React.FC<GraphProps> = ({
               dataKey={`${date}_${yKey}`}
               name={date}
               stroke={lineColors[idx % lineColors.length]}
+              strokeWidth={3}
             />
           ))}
           <CartesianGrid />
@@ -140,7 +141,7 @@ const Graph: React.FC<GraphProps> = ({
     return (
       <ChartContainer config={chartConfig}>
         <LineChart data={data} margin={{ top: 10, right: 40 }}>
-          <Line dataKey={yKey} />
+          <Line dataKey={yKey} strokeWidth={3} />
           <CartesianGrid />
           <XAxis
             dataKey={xKey}
