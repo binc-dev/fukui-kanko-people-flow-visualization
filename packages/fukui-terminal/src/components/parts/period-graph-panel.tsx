@@ -71,8 +71,8 @@ export function PeriodGraphPanel({
           ) : (period.startMonth && period.endMonth) ||
             (period.startWeekRange && period.endWeekRange) ||
             (period.startDate && period.endDate) ? (
-            <CardContent>
-              <div className="bg-gray-50 rounded-lg">
+            <CardContent className="px-4">
+              <div className="bg-gray-50 rounded-lg pr-4">
                 <Graph theme={theme} data={theme === "hour" ? filteredDailyData : filteredData} />
               </div>
               <StatsSummary

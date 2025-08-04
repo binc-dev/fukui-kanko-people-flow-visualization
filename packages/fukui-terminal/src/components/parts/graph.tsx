@@ -107,53 +107,59 @@ const Graph: React.FC<GraphProps> = ({
     });
 
     return (
-      <div>
-        <ChartContainer config={chartConfig}>
-          <LineChart margin={{ top: 10, right: 40 }}>
-            {Object.entries(grouped).map(([date, rows], idx) => (
-              <Line
-                key={date}
-                data={rows}
-                dataKey={`${date}_${yKey}`}
-                name={date}
-                stroke={lineColors[idx % lineColors.length]}
-              />
-            ))}
-            <CartesianGrid />
-            <XAxis dataKey={xKey} tickMargin={8} allowDuplicatedCategory={false} />
-            <YAxis />
-            <ChartTooltip
-              cursor={{ fillOpacity: 0.4, stroke: "hsl(var(--primary))" }}
-              content={<ChartTooltipContent className="bg-white" />}
+      <ChartContainer config={chartConfig}>
+        <LineChart margin={{ top: 10, right: 40 }}>
+          {Object.entries(grouped).map(([date, rows], idx) => (
+            <Line
+              key={date}
+              data={rows}
+              dataKey={`${date}_${yKey}`}
+              name={date}
+              stroke={lineColors[idx % lineColors.length]}
             />
-            <ChartLegend content={<ChartLegendContent />} />
-          </LineChart>
-        </ChartContainer>
-      </div>
+          ))}
+          <CartesianGrid />
+          <XAxis dataKey={xKey} tickMargin={8} allowDuplicatedCategory={false} />
+          <YAxis />
+          <ChartTooltip
+            cursor={{ fillOpacity: 0.4, stroke: "hsl(var(--primary))" }}
+            content={<ChartTooltipContent className="bg-white" />}
+          />
+          <ChartLegend
+            wrapperStyle={{
+              width: "100%",
+            }}
+            content={<ChartLegendContent />}
+          />
+        </LineChart>
+      </ChartContainer>
     );
   }
 
   if (theme === "month" || theme === "week" || theme === "day") {
     return (
-      <div>
-        <ChartContainer config={chartConfig}>
-          <LineChart data={data} margin={{ top: 10, right: 40 }}>
-            <Line dataKey={yKey} />
-            <CartesianGrid />
-            <XAxis
-              dataKey={xKey}
-              tick={theme === "day" ? (props) => renderTick(props, data, xKey) : undefined}
-              tickMargin={8}
-            />
-            <YAxis />
-            <ChartTooltip
-              cursor={{ fillOpacity: 0.4, stroke: "hsl(var(--primary))" }}
-              content={<ChartTooltipContent className="bg-white" />}
-            />
-            <ChartLegend content={<ChartLegendContent />} />
-          </LineChart>
-        </ChartContainer>
-      </div>
+      <ChartContainer config={chartConfig}>
+        <LineChart data={data} margin={{ top: 10, right: 40 }}>
+          <Line dataKey={yKey} />
+          <CartesianGrid />
+          <XAxis
+            dataKey={xKey}
+            tick={theme === "day" ? (props) => renderTick(props, data, xKey) : undefined}
+            tickMargin={8}
+          />
+          <YAxis />
+          <ChartTooltip
+            cursor={{ fillOpacity: 0.4, stroke: "hsl(var(--primary))" }}
+            content={<ChartTooltipContent className="bg-white" />}
+          />
+          <ChartLegend
+            wrapperStyle={{
+              width: "100%",
+            }}
+            content={<ChartLegendContent />}
+          />
+        </LineChart>
+      </ChartContainer>
     );
   }
 };
