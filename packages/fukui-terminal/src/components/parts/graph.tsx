@@ -1,4 +1,3 @@
-import { StatsSummary } from "@/components/parts/stats-summary";
 import {
   ChartContainer,
   ChartLegend,
@@ -130,7 +129,6 @@ const Graph: React.FC<GraphProps> = ({
             <ChartLegend content={<ChartLegendContent />} />
           </LineChart>
         </ChartContainer>
-        <StatsSummary theme={theme} data={data} />
       </div>
     );
   }
@@ -155,7 +153,6 @@ const Graph: React.FC<GraphProps> = ({
             <ChartLegend content={<ChartLegendContent />} />
           </LineChart>
         </ChartContainer>
-        <StatsSummary theme={theme} data={data} />
       </div>
     );
   }

@@ -2,6 +2,8 @@ import { Graph } from "@/components/parts/graph";
 import { LoadingSpinner } from "@/components/parts/loading-spinner";
 import { MonthRangePicker } from "@/components/parts/month-range-picker";
 import { RangeSelector } from "@/components/parts/range-selector";
+import { StatsSummary } from "@/components/parts/stats-summary";
+import { Card, CardContent } from "@/components/ui/card";
 import { AggregatedData } from "@/interfaces/aggregated-data.interface";
 import { Period } from "@/interfaces/period.interface";
 
@@ -54,16 +56,36 @@ export function PeriodGraphPanel({
         />
       )}
 
-      <div className="w-2/3">
-        {isLoading && theme === "hour" ? (
-          <LoadingSpinner />
-        ) : (period.startMonth && period.endMonth) ||
-          (period.startWeekRange && period.endWeekRange) ||
-          (period.startDate && period.endDate) ? (
-          <Graph theme={theme} data={theme === "hour" ? filteredDailyData : filteredData} />
-        ) : (
-          <p>範囲を選択してください。</p>
-        )}
+      <div className="w-full flex flex-col items-center justify-end min-h-[400px]">
+        <Card
+          className={
+            (period.startMonth && period.endMonth) ||
+            (period.startWeekRange && period.endWeekRange) ||
+            (period.startDate && period.endDate)
+              ? "w-2/3 min-h-[500px] pt-4 pb-0 mt-2"
+              : "w-2/3 min-h-[200px]"
+          }
+        >
+          {isLoading && theme === "hour" ? (
+            <LoadingSpinner />
+          ) : (period.startMonth && period.endMonth) ||
+            (period.startWeekRange && period.endWeekRange) ||
+            (period.startDate && period.endDate) ? (
+            <CardContent>
+              <div className="bg-gray-50 rounded-lg">
+                <Graph theme={theme} data={theme === "hour" ? filteredDailyData : filteredData} />
+              </div>
+              <StatsSummary
+                theme={theme}
+                data={theme === "hour" ? filteredDailyData : filteredData}
+              />
+            </CardContent>
+          ) : (
+            <CardContent className="flex items-center justify-center h-full text-gray-500">
+              <p className="text-lg">表示したい期間を設定してください。</p>
+            </CardContent>
+          )}
+        </Card>
       </div>
     </div>
   );
