@@ -71,7 +71,7 @@ export const StatsSummary: React.FC<StatsSummaryProps> = ({ theme, data }) => {
     <div className="flex justify-center">
       <div
         className={`grid ${
-          theme === "hour" ? "grid-cols-[1fr_1fr]" : "grid-cols-[1fr_1.5fr]"
+          theme === "hour" ? "md:grid-cols-[1fr_1fr]" : "md:grid-cols-[1fr_1.5fr]"
         } gap-3 mt-2 mb-4 w-full max-w-md`}
       >
         {/* 合計人数 */}
