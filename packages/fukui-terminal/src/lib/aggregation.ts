@@ -1,4 +1,4 @@
-import { AggregatedData } from "@/interfaces/aggregated-data.interface";
+import { AggregatedData, TOTAL_COUNT_KEY } from "@/interfaces/aggregated-data.interface";
 import { Period } from "@/interfaces/period.interface";
 import * as holidayJP from "@holiday-jp/holiday_jp";
 
@@ -31,21 +31,21 @@ export function aggregateMonthly(data: AggregatedData[], start: Date, end: Date)
     if (!monthlyMap.has(monthKey)) {
       monthlyMap.set(monthKey, {
         ...row,
-        ["aggregate from"]: `${monthKey}`,
-        ["aggregate to"]: `${monthKey}`,
-        ["total count"]: Number(row["total count"]),
-        weekdayTotal: !isWeekendOrHoliday ? Number(row["total count"]) : 0,
-        weekendTotal: isWeekendOrHoliday ? Number(row["total count"]) : 0,
+        aggregateFrom: `${monthKey}`,
+        aggregateTo: `${monthKey}`,
+        totalCount: Number(row[TOTAL_COUNT_KEY]),
+        weekdayTotal: !isWeekendOrHoliday ? Number(row[TOTAL_COUNT_KEY]) : 0,
+        weekendTotal: isWeekendOrHoliday ? Number(row[TOTAL_COUNT_KEY]) : 0,
       });
     } else {
       const prev = monthlyMap.get(monthKey)!;
       monthlyMap.set(monthKey, {
         ...prev,
-        ["total count"]: Number(prev["total count"]) + Number(row["total count"]),
+        totalCount: Number(prev.totalCount) + Number(row[TOTAL_COUNT_KEY]),
         weekdayTotal:
-          (prev.weekdayTotal ?? 0) + (!isWeekendOrHoliday ? Number(row["total count"]) : 0),
+          (prev.weekdayTotal ?? 0) + (!isWeekendOrHoliday ? Number(row[TOTAL_COUNT_KEY]) : 0),
         weekendTotal:
-          (prev.weekendTotal ?? 0) + (isWeekendOrHoliday ? Number(row["total count"]) : 0),
+          (prev.weekendTotal ?? 0) + (isWeekendOrHoliday ? Number(row[TOTAL_COUNT_KEY]) : 0),
       });
     }
   });
@@ -81,7 +81,7 @@ export function aggregateWeekly(
     if (weekRows.length === 0) continue;
     const formatDate = (date: Date) =>
       `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-    const total = weekRows.reduce((sum, row) => sum + Number(row["total count"]), 0);
+    const total = weekRows.reduce((sum, row) => sum + Number(row[TOTAL_COUNT_KEY]), 0);
 
     let weekdayTotal = 0;
     let weekendTotal = 0;
@@ -92,17 +92,17 @@ export function aggregateWeekly(
       const isHoliday = holidayJP.isHoliday(date);
       const isWeekendOrHoliday = isWeekend || isHoliday;
       if (isWeekendOrHoliday) {
-        weekendTotal += Number(row["total count"]);
+        weekendTotal += Number(row[TOTAL_COUNT_KEY]);
       } else {
-        weekdayTotal += Number(row["total count"]);
+        weekdayTotal += Number(row[TOTAL_COUNT_KEY]);
       }
     });
 
     weeklyAggregated.push({
       ...weekRows[0],
-      ["aggregate from"]: `${formatDate(new Date(weekRows[0]["aggregate from"]))}〜`,
-      ["aggregate to"]: `${formatDate(new Date(weekRows[weekRows.length - 1]["aggregate from"]))}`,
-      ["total count"]: total,
+      aggregateFrom: `${formatDate(new Date(weekRows[0]["aggregate from"]))}〜`,
+      aggregateTo: `${formatDate(new Date(weekRows[weekRows.length - 1]["aggregate from"]))}`,
+      totalCount: total,
       weekdayTotal,
       weekendTotal,
     });
@@ -128,9 +128,9 @@ export function aggregateDaily(data: AggregatedData[], start: Date, end: Date): 
       }
       dailyMap.set(dayKey, {
         ...row,
-        ["aggregate from"]: `${dayKey}`,
-        ["aggregate to"]: `${dayKey}`,
-        ["total count"]: Number(row["total count"]),
+        aggregateFrom: `${dayKey}`,
+        aggregateTo: `${dayKey}`,
+        totalCount: Number(row[TOTAL_COUNT_KEY]),
         dayOfWeek,
         holidayName,
       });
@@ -150,9 +150,9 @@ export function aggregateHourly(data: AggregatedData[]): AggregatedData[] {
     if (!hourlyMap.has(hourKey)) {
       hourlyMap.set(hourKey, {
         ...row,
-        ["aggregate from"]: hourKey,
-        ["aggregate to"]: hourKey,
-        ["total count"]: Number(row["total count"]),
+        aggregateFrom: hourKey,
+        aggregateTo: hourKey,
+        totalCount: Number(row[TOTAL_COUNT_KEY]),
       });
     } else {
       const prev = hourlyMap.get(hourKey)!;

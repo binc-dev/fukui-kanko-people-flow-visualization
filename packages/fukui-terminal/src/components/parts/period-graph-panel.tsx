@@ -10,7 +10,7 @@ import { DownloadIcon } from "@primer/octicons-react";
 import { saveAs } from "file-saver";
 
 type PeriodGraphPanelProps = {
-  theme: "month" | "week" | "day" | "hour";
+  type: "month" | "week" | "day" | "hour";
   period: Period;
   setPeriod: React.Dispatch<React.SetStateAction<Period>>;
   isCompareMode: boolean;
@@ -19,15 +19,15 @@ type PeriodGraphPanelProps = {
   filteredDailyData: AggregatedData[];
 };
 
-function convertToCSV(data: AggregatedData[]): string {
+function convertToCSV(data: AggregatedData[], selectedHeaders?: string[]): string {
   if (data.length === 0) return "";
-  const headers = Object.keys(data[0]);
+  const headers = selectedHeaders ?? Object.keys(data[0]);
   const rows = data.map((row) => headers.map((h) => `"${row[h] ?? ""}"`).join(","));
   return [headers.join(","), ...rows].join("\n");
 }
 
 export function PeriodGraphPanel({
-  theme,
+  type,
   period,
   setPeriod,
   isCompareMode,
@@ -36,7 +36,24 @@ export function PeriodGraphPanel({
   filteredDailyData,
 }: PeriodGraphPanelProps) {
   const handleDownloadCSV = (data: AggregatedData[]) => {
-    const csv = convertToCSV(data);
+    let headers: string[] = [];
+    switch (type) {
+      case "month":
+        headers = ["aggregateFrom", "aggregateTo", "totalCount", "weekdayTotal", "weekendTotal"];
+        break;
+      case "week":
+        headers = ["aggregateFrom", "aggregateTo", "totalCount", "weekdayTotal", "weekendTotal"];
+        break;
+      case "day":
+        headers = ["aggregateFrom", "aggregateTo", "totalCount", "dayOfWeek", "holidayName"];
+        break;
+      case "hour":
+        headers = ["aggregateFrom", "aggregateTo", "totalCount"];
+        break;
+      default:
+        headers = Object.keys(data[0] ?? {});
+    }
+    const csv = convertToCSV(data, headers);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     saveAs(blob, "fukui-terminal-data.csv");
   };
@@ -48,7 +65,7 @@ export function PeriodGraphPanel({
           !isCompareMode ? "sm:pl-[88px]" : ""
         }`}
       >
-        {theme === "month" && (
+        {type === "month" && (
           <MonthRangePicker
             startMonth={period.startMonth}
             endMonth={period.endMonth}
@@ -58,7 +75,7 @@ export function PeriodGraphPanel({
           />
         )}
 
-        {theme === "week" && (
+        {type === "week" && (
           <RangeSelector
             type="week"
             start={period.startWeekRange}
@@ -68,7 +85,7 @@ export function PeriodGraphPanel({
           />
         )}
 
-        {(theme === "day" || theme === "hour") && (
+        {(type === "day" || type === "hour") && (
           <RangeSelector
             type="date"
             start={period.startDate}
@@ -80,7 +97,7 @@ export function PeriodGraphPanel({
 
         <button
           className="h-9 px-3 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-          onClick={() => handleDownloadCSV(theme === "hour" ? filteredDailyData : filteredData)}
+          onClick={() => handleDownloadCSV(type === "hour" ? filteredDailyData : filteredData)}
           disabled={
             !(
               (period.startMonth && period.endMonth) ||
@@ -106,19 +123,16 @@ export function PeriodGraphPanel({
               : "min-h-[20vh]"
           } ${isCompareMode ? "w-full" : "w-2/3"}`}
         >
-          {isLoading && theme === "hour" ? (
+          {isLoading && type === "hour" ? (
             <LoadingSpinner />
           ) : (period.startMonth && period.endMonth) ||
             (period.startWeekRange && period.endWeekRange) ||
             (period.startDate && period.endDate) ? (
             <CardContent className="px-4">
               <div className="bg-gray-50 rounded-lg pr-4">
-                <Graph theme={theme} data={theme === "hour" ? filteredDailyData : filteredData} />
+                <Graph type={type} data={type === "hour" ? filteredDailyData : filteredData} />
               </div>
-              <StatsSummary
-                theme={theme}
-                data={theme === "hour" ? filteredDailyData : filteredData}
-              />
+              <StatsSummary type={type} data={type === "hour" ? filteredDailyData : filteredData} />
             </CardContent>
           ) : (
             <CardContent className="flex items-center justify-center h-full text-gray-500">
