@@ -1,5 +1,7 @@
+import { AverageBar } from "@/components/parts/average-bar";
 import { AggregatedData } from "@/interfaces/aggregated-data.interface";
 import React from "react";
+import { PeopleIcon } from "@primer/octicons-react";
 
 type StatsSummaryProps = {
   theme: "month" | "week" | "day" | "hour";
@@ -55,26 +57,69 @@ function getWeekdayAverages(data: AggregatedData[], theme: string) {
 export const StatsSummary: React.FC<StatsSummaryProps> = ({ theme, data }) => {
   const { sum, avg } = getStats(data ?? []);
   const { weekdayAvg, weekendAvg } = getWeekdayAverages(data ?? [], theme);
+  const statsData = {
+    sum: Math.round(sum),
+    avg: Math.round(avg),
+    weekdayAvg: Math.round(weekdayAvg),
+    weekendAvg: Math.round(weekendAvg),
+  };
+
+  // 最大値（グラフ幅用）
+  const maxAvg = Math.max(statsData.avg, statsData.weekdayAvg, statsData.weekendAvg, 1);
 
   return (
     <div className="flex justify-center">
-      <div className="my-4">
-        <div className="flex justify-end">
-          <p>
-            合計人数: {Math.round(sum).toLocaleString()}人 / 平均人数:{" "}
-            {Math.round(avg).toLocaleString()}人
-          </p>
-        </div>
-        {theme !== "hour" && (
-          <div>
-            <div className="flex justify-end">
-              <p>平日平均: {Math.round(weekdayAvg).toLocaleString()}人</p>
-            </div>
-            <div className="flex justify-end">
-              <p>土日祝平均: {Math.round(weekendAvg).toLocaleString()}人</p>
-            </div>
+      <div
+        className={`grid ${
+          theme === "hour" ? "grid-cols-[1fr_1fr]" : "grid-cols-[1fr_1.5fr]"
+        } gap-3 mt-2 mb-4 w-full max-w-md`}
+      >
+        {/* 合計人数 */}
+        <div className="bg-blue-50 rounded-lg p-2 text-center">
+          <div className="flex items-center justify-center gap-1 mb-1">
+            <PeopleIcon size={16} className="w-4 h-4 text-blue-600" />
+            <p className=" text-blue-600">合計人数</p>
           </div>
-        )}
+          <p className="text-lg font-medium text-blue-800">{statsData.sum.toLocaleString()}人</p>
+        </div>
+        {/* 平均人数 */}
+        <div className="bg-green-50 rounded-lg p-2 text-center">
+          {theme !== "hour" ? (
+            <>
+              <AverageBar
+                color="bg-blue-500"
+                label="全体平均"
+                value={statsData.avg}
+                max={maxAvg}
+                valueColor="text-blue-700"
+              />
+              <AverageBar
+                color="bg-green-500"
+                label="平日平均"
+                value={statsData.weekdayAvg}
+                max={maxAvg}
+                valueColor="text-green-700"
+              />
+              <AverageBar
+                color="bg-orange-500"
+                label="土日祝平均"
+                value={statsData.weekendAvg}
+                max={maxAvg}
+                valueColor="text-orange-700"
+              />
+            </>
+          ) : (
+            <>
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <PeopleIcon size={16} className="w-4 h-4 text-green-600" />
+                <p className=" text-green-600">1時間平均人数</p>
+              </div>
+              <p className="text-lg font-medium text-green-800">
+                {statsData.avg.toLocaleString()}人
+              </p>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
