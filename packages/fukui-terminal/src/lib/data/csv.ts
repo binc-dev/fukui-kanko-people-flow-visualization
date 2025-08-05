@@ -6,10 +6,15 @@ import Papa from "papaparse";
 
 const getUrlPrefix = () => `${location.origin}${location.pathname}`;
 
-async function getRawData(
+export async function getRawData(
   objectClass: ObjectClass,
 ): Promise<AggregatedData[]> {
   const csvResponse = await fetch(getUrlPrefix() + `${objectClass}.csv`);
+  
+  if (!csvResponse.ok) {
+    throw new Error(`CSVファイルの取得に失敗しました: ${csvResponse.status} ${csvResponse.statusText}`);
+  }
+  
   const csvRawText = await csvResponse.text();
   const csvFormattedText = csvRawText.replaceAll(/\n{2,}/g, "\n");
 

@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/select";
 import { AggregatedData } from "@/interfaces/aggregated-data.interface";
 import { Period } from "@/interfaces/period.interface";
-import { getData } from "@/lib/data/csv";
+import { getRawData } from "@/lib/data/csv";
 import { useDailyDataEffect, useFilteredData } from "@/lib/hooks/period-data-effects";
 import { useEffect, useState } from "react";
 import { PeriodGraphPanel } from "./components/parts/period-graph-panel";
 
 function App() {
-  const [theme, setTheme] = useState<"month" | "week" | "day" | "hour">("month");
+  const [type, setType] = useState<"month" | "week" | "day" | "hour">("month");
   const [csvData, setCsvData] = useState<AggregatedData[]>([]);
   const [csvDailyData, setCsvDailyData] = useState<AggregatedData[]>([]);
   const [compareCsvDailyData, setCompareCsvDailyData] = useState<AggregatedData[]>([]);
@@ -49,18 +49,24 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const rawData = await getData("Person");
-      setCsvData(rawData);
+      try {
+        const rawData = await getRawData("Person");
+        setCsvData(rawData);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("データの取得に失敗しました:", error);
+        setCsvData([]);
+      }
     };
     fetchData();
   }, []);
 
   // 本期間の集計データを期間・テーマ・データ変更時に再計算
-  useFilteredData(theme, period, csvData, csvDailyData, setFilteredData, setFilteredDailyData);
+  useFilteredData(type, period, csvData, csvDailyData, setFilteredData, setFilteredDailyData);
 
   // 比較期間の集計データを期間・テーマ・データ変更時に再計算
   useFilteredData(
-    theme,
+    type,
     comparePeriod,
     csvData,
     compareCsvDailyData,
@@ -69,10 +75,10 @@ function App() {
   );
 
   // 本期間の時間別データを取得・更新
-  useDailyDataEffect(theme, period, setCsvDailyData, setIsLoading);
+  useDailyDataEffect(type, period, setCsvDailyData, setIsLoading);
 
   // 比較期間の時間別データを取得・更新
-  useDailyDataEffect(theme, comparePeriod, setCompareCsvDailyData, setCompareIsLoading);
+  useDailyDataEffect(type, comparePeriod, setCompareCsvDailyData, setCompareIsLoading);
 
   return (
     <div className="h-full w-full max-w-full text-center flex flex-col items-center gap-2 mt-3">
@@ -80,10 +86,10 @@ function App() {
         <div className="flex flex-row items-center gap-2">
           <p>表示単位</p>
           <Select
-            value={theme}
+            value={type}
             onValueChange={(v) => {
-              const newTheme = v as "month" | "week" | "day" | "hour";
-              setTheme(newTheme);
+              const newType = v as "month" | "week" | "day" | "hour";
+              setType(newType);
               // テーマ変更時に値をリセット
               setPeriod({
                 startDate: undefined,
@@ -127,7 +133,7 @@ function App() {
       </div>
       <div className="flex flex-col md:flex-row w-full gap-4 justify-center">
         <PeriodGraphPanel
-          theme={theme}
+          theme={type}
           period={period}
           setPeriod={setPeriod}
           isCompareMode={compareMode}
@@ -137,7 +143,7 @@ function App() {
         />
         {compareMode && (
           <PeriodGraphPanel
-            theme={theme}
+            theme={type}
             period={comparePeriod}
             setPeriod={setComparePeriod}
             isCompareMode={compareMode}
