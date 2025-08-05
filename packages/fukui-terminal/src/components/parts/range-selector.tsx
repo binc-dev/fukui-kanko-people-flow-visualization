@@ -49,13 +49,6 @@ function getWeekRange(date: Date) {
   }
   return { from: startDay, to: endDay };
 }
-
-/**
- * 終了日が開始日より前の日付を選択できないようにする
- */
-function isBeforeStart(start: Date | undefined) {
-  return start ? (date: Date) => date < start : undefined;
-}
 /**
  * 週範囲選択時、開始週より前を選択不可にする
  */
@@ -134,6 +127,7 @@ export const RangeSelector = ({ type, start, end, setStart, setEnd }: RangeSelec
                 mode="single"
                 selected={start}
                 captionLayout="dropdown"
+                disabled={isOutOfRange}
                 onSelect={(date) => {
                   setStart(date);
                   setOpenStart(false);
@@ -181,7 +175,7 @@ export const RangeSelector = ({ type, start, end, setStart, setEnd }: RangeSelec
                 mode="single"
                 selected={end}
                 captionLayout="dropdown"
-                disabled={isBeforeStart(start)}
+                disabled={(date) => isOutOfRange(date) || (start ? date < start : false)}
                 onSelect={(date) => {
                   setEnd(date);
                   setOpenEnd(false);
