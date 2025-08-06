@@ -9,11 +9,17 @@ import { AggregatedData } from "@/interfaces/aggregated-data.interface";
 import React from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
+const chartConfig = {
+  totalCount: { label: "人物検出回数" },
+};
+
 type GraphProps = {
   data: AggregatedData[];
   xKey?: string;
   yKey?: string;
-  theme: "month" | "week" | "day" | "hour";
+  type: "month" | "week" | "day" | "hour";
+  width?: number;
+  height?: number;
 };
 
 type XAxisTickProps = {
@@ -21,10 +27,6 @@ type XAxisTickProps = {
   y: number;
   payload: { value: string };
   index?: number;
-};
-
-const chartConfig = {
-  "total count": { label: "人物検出回数" },
 };
 
 function renderTick(props: XAxisTickProps, data: AggregatedData[], xKey: string) {
@@ -74,11 +76,11 @@ const CustomizedXAxisTick = ({
 
 const Graph: React.FC<GraphProps> = ({
   data,
-  xKey = "aggregate from",
-  yKey = "total count",
-  theme,
+  xKey = "aggregateFrom",
+  yKey = "totalCount",
+  type,
 }) => {
-  if (theme === "month" || theme === "week" || theme === "day") {
+  if (type === "month" || type === "week" || type === "day") {
     return (
       <ChartContainer config={chartConfig}>
         <LineChart data={data} margin={{ top: 10, right: 40 }}>
@@ -86,7 +88,7 @@ const Graph: React.FC<GraphProps> = ({
           <CartesianGrid />
           <XAxis
             dataKey={xKey}
-            tick={theme === "day" ? (props) => renderTick(props, data, xKey) : undefined}
+            tick={type === "day" ? (props) => renderTick(props, data, xKey) : undefined}
             tickMargin={8}
           />
           <YAxis />
@@ -99,6 +101,12 @@ const Graph: React.FC<GraphProps> = ({
       </ChartContainer>
     );
   }
+
+  return (
+    <div>
+      <p>このタイプ（{type}）のグラフは開発中です。</p>
+    </div>
+  );
 };
 
 export { Graph };
