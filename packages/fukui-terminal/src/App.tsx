@@ -11,6 +11,7 @@ import {
 import { AggregatedData, TOTAL_COUNT_KEY } from "@/interfaces/aggregated-data.interface";
 import { getRawData } from "@/lib/data/csv";
 import { useEffect, useState } from "react";
+import * as holidayJP from "@holiday-jp/holiday_jp";
 import { formatDate } from "./lib/utils";
 
 function App() {
@@ -118,9 +119,44 @@ function App() {
       setFilteredData(weeklyAggregated);
       return;
     }
+
+    if (type === "day" && startDate && endDate) {
+      // 日付の範囲でフィルタ
+      filtered = filtered.filter((row) => {
+        const date = new Date(row["aggregate from"]);
+        return date >= startDate && date <= endDate;
+      });
+
+      // 日ごとに集計
+      const dailyMap = new Map<string, AggregatedData>();
+      filtered.forEach((row) => {
+        const date = new Date(row["aggregate from"]);
+        const dayKey = `${formatDate(date, "-")}`;
+        if (!dailyMap.has(dayKey)) {
+          const dayOfWeek = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
+          let holidayName: string = "";
+          // 指定日が祝日なら祝日名を取得
+          const holiday = holidayJP.between(date, date);
+          if (holiday.length > 0) {
+            holidayName = holiday[0].name;
+          }
+          dailyMap.set(dayKey, {
+            ...row,
+            aggregateFrom: `${dayKey}`,
+            aggregateTo: `${dayKey}`,
+            totalCount: Number(row[TOTAL_COUNT_KEY]),
+            dayOfWeek,
+            holidayName,
+          });
+        }
+      });
+      setFilteredData(Array.from(dailyMap.values()));
+      return;
+    }
+
     // TODO:他の期間の処理を実装する
     setFilteredData(filtered);
-  }, [type, startMonth, endMonth, startWeekRange, endWeekRange]);
+  }, [type, startMonth, endMonth, startWeekRange, endWeekRange, startDate, endDate, csvData]);
 
   return (
     <>
@@ -184,7 +220,9 @@ function App() {
             )}
           </div>
           <div className="my-8">
-            {(startMonth && endMonth) || (startWeekRange && endWeekRange) ? (
+            {(startMonth && endMonth) ||
+            (startWeekRange && endWeekRange) ||
+            (startDate && endDate) ? (
               <Graph type={type} data={filteredData} />
             ) : (
               <p>範囲を選択してください。</p>

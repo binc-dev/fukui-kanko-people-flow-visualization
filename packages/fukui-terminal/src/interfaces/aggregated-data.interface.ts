@@ -10,6 +10,8 @@ export type AggregatedDataBase = {
   "object class": ObjectClass;
   "aggregate from": string;
   "aggregate to": string;
+  dayOfWeek: string;
+  holidayName: string;
   [TOTAL_COUNT_KEY]: number;
 };
 export type AggregatedData = AggregatedDataBase & Record<string, string | number>;

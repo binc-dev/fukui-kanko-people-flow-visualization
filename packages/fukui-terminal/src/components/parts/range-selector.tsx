@@ -24,10 +24,6 @@ type RangeSelectorProps =
       setEnd: (date: Date | undefined) => void;
     };
 
-function isOutOfRange(date: Date) {
-  return date < MIN_DATE || date > MAX_DATE;
-}
-
 function getWeekRange(date: Date) {
   let startDay = new Date(date);
   let endDay: Date;
@@ -52,16 +48,10 @@ function getWeekRange(date: Date) {
 }
 
 /**
- * 終了日が開始日より前の日付を選択できないようにする
+ * データが無い日、または開始日より前の日付を選択できないようにする
  */
-function isBeforeStart(start: Date | undefined) {
-  return start ? (date: Date) => date < start : undefined;
-}
-/**
- * 週範囲選択時、開始週より前を選択不可にする
- */
-function isBeforeStartWeek(date: Date, start: WeekRange | undefined) {
-  return start?.from ? date < start.from : false;
+function isDisabledDate(date: Date, start?: Date) {
+  return date < MIN_DATE || date > MAX_DATE || (start ? date < start : false);
 }
 
 export const RangeSelector = ({ type, start, end, setStart, setEnd }: RangeSelectorProps) => {
@@ -125,7 +115,7 @@ export const RangeSelector = ({ type, start, end, setStart, setEnd }: RangeSelec
                 mode="range"
                 selected={start}
                 captionLayout="dropdown"
-                disabled={isOutOfRange}
+                disabled={isDisabledDate}
                 onSelect={(date) => {
                   handleWeekRangeSelect(date, start, setStart, () => setOpenStart(false));
                 }}
@@ -135,6 +125,7 @@ export const RangeSelector = ({ type, start, end, setStart, setEnd }: RangeSelec
                 mode="single"
                 selected={start}
                 captionLayout="dropdown"
+                disabled={isDisabledDate}
                 onSelect={(date) => {
                   setStart(date);
                   setOpenStart(false);
@@ -172,7 +163,7 @@ export const RangeSelector = ({ type, start, end, setStart, setEnd }: RangeSelec
                 mode="range"
                 selected={end}
                 captionLayout="dropdown"
-                disabled={(date) => isOutOfRange(date) || isBeforeStartWeek(date, start)}
+                disabled={(date) => isDisabledDate(date, start?.from)}
                 onSelect={(date) => {
                   handleWeekRangeSelect(date, end, setEnd, () => setOpenEnd(false));
                 }}
@@ -182,7 +173,7 @@ export const RangeSelector = ({ type, start, end, setStart, setEnd }: RangeSelec
                 mode="single"
                 selected={end}
                 captionLayout="dropdown"
-                disabled={isBeforeStart(start)}
+                disabled={(date) => isDisabledDate(date, start)}
                 onSelect={(date) => {
                   setEnd(date);
                   setOpenEnd(false);
