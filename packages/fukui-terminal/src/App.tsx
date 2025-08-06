@@ -142,9 +142,9 @@ function App() {
           }
           dailyMap.set(dayKey, {
             ...row,
-            ["aggregate from"]: `${dayKey}`,
-            ["aggregate to"]: `${dayKey}`,
-            ["total count"]: Number(row["total count"]),
+            aggregateFrom: `${dayKey}`,
+            aggregateTo: `${dayKey}`,
+            totalCount: Number(row[TOTAL_COUNT_KEY]),
             dayOfWeek,
             holidayName,
           });

@@ -176,7 +176,7 @@ export const RangeSelector = ({ type, start, end, setStart, setEnd }: RangeSelec
                 mode="range"
                 selected={end}
                 captionLayout="dropdown"
-                disabled={(date) => isOutOfRange(date) || isBeforeStartWeek(date, start)}
+                disabled={(date) => isDisabledDate(date) || isBeforeStartWeek(date, start)}
                 onSelect={(date) => {
                   handleWeekRangeSelect(date, end, setEnd, () => setOpenEnd(false));
                 }}
