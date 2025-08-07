@@ -1,4 +1,4 @@
-import { ObjectClassAttribute } from "@/interfaces/aggregated-data.interface";
+import { ObjectClassAttribute } from "@fukui-kanko/shared";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
