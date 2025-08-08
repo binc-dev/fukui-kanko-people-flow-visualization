@@ -140,7 +140,7 @@ const Graph: React.FC<GraphProps> = ({
   if (theme === "month" || theme === "week" || theme === "day") {
     return (
       <ChartContainer config={chartConfig}>
-        <LineChart data={data} margin={{ top: 10, right: 40 }}>
+        <LineChart data={data} margin={{ top: 10, bottom: 10, right: 40 }}>
           <Line dataKey={yKey} strokeWidth={3} stroke="#2563eb" />
           <CartesianGrid />
           <XAxis
@@ -152,12 +152,6 @@ const Graph: React.FC<GraphProps> = ({
           <ChartTooltip
             cursor={{ fillOpacity: 0.4, stroke: "hsl(var(--primary))" }}
             content={<ChartTooltipContent className="bg-white" />}
-          />
-          <ChartLegend
-            wrapperStyle={{
-              width: "100%",
-            }}
-            content={<ChartLegendContent />}
           />
         </LineChart>
       </ChartContainer>
