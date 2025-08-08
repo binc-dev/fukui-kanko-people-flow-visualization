@@ -116,7 +116,7 @@ const Graph: React.FC<GraphProps> = ({
     });
 
     return (
-      <ChartContainer config={chartConfig}>
+      <ChartContainer config={chartConfig} className="h-full w-full">
         <LineChart margin={{ top: 10, right: 40 }}>
           {Object.entries(grouped).map(([date, rows], idx) => (
             <Line
@@ -148,7 +148,7 @@ const Graph: React.FC<GraphProps> = ({
 
   if (theme === "month" || theme === "week" || theme === "day") {
     return (
-      <ChartContainer config={chartConfig}>
+      <ChartContainer config={chartConfig} className="h-full w-full">
         <LineChart data={data} margin={{ top: 10, bottom: 10, right: 40 }}>
           <Line dataKey={yKey} strokeWidth={3} stroke="#2563eb" />
           <CartesianGrid />

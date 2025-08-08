@@ -3,7 +3,6 @@ import { LoadingSpinner } from "@/components/parts/loading-spinner";
 import { MonthRangePicker } from "@/components/parts/month-range-picker";
 import { RangeSelector } from "@/components/parts/range-selector";
 import { StatsSummary } from "@/components/parts/stats-summary";
-import { Card, CardContent } from "@/components/ui/card";
 import { AggregatedData } from "@/interfaces/aggregated-data.interface";
 import { Period } from "@/interfaces/period.interface";
 
@@ -59,35 +58,37 @@ export function PeriodGraphPanel({
       )}
 
       <div className="w-full flex flex-col items-center justify-end min-h-[40vh]">
-        <Card
+        <div
           className={`${
             (period.startMonth && period.endMonth) ||
             (period.startWeekRange && period.endWeekRange) ||
             (period.startDate && period.endDate)
               ? "min-h-[60vh] pt-4 pb-0 mt-2"
               : "min-h-[20vh]"
-          } ${isCompareMode ? "w-full" : "w-2/3"}`}
+          } w-full`}
         >
           {isLoading && theme === "hour" ? (
             <LoadingSpinner />
           ) : (period.startMonth && period.endMonth) ||
             (period.startWeekRange && period.endWeekRange) ||
             (period.startDate && period.endDate) ? (
-            <CardContent className="px-4">
-              <div className="bg-gray-50 rounded-lg pr-4">
+            <>
+              <div className=" rounded-lg w-full h-[60vh]">
                 <Graph theme={theme} data={theme === "hour" ? filteredDailyData : filteredData} />
               </div>
-              <StatsSummary
-                theme={theme}
-                data={theme === "hour" ? filteredDailyData : filteredData}
-              />
-            </CardContent>
+              <div className={`${isCompareMode ? "w-full" : "w-2/3"} mx-auto px-4 mt-4`}>
+                <StatsSummary
+                  theme={theme}
+                  data={theme === "hour" ? filteredDailyData : filteredData}
+                />
+              </div>
+            </>
           ) : (
-            <CardContent className="flex items-center justify-center h-full text-gray-500">
+            <div className="flex items-center justify-center h-full text-gray-500">
               <p className="text-lg">表示したい期間を設定してください。</p>
-            </CardContent>
+            </div>
           )}
-        </Card>
+        </div>
       </div>
     </div>
   );
