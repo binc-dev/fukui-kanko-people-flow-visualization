@@ -6,7 +6,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { AggregatedData } from "@/interfaces/aggregated-data.interface";
-import React from "react";
+import React, { useCallback } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
 const chartConfig = {
@@ -80,17 +80,17 @@ const Graph: React.FC<GraphProps> = ({
   yKey = "totalCount",
   type,
 }) => {
+  const tickRenderer = useCallback(
+    (props: XAxisTickProps) => renderTick(props, data, xKey),
+    [data, xKey],
+  );
   if (type === "month" || type === "week" || type === "day") {
     return (
       <ChartContainer config={chartConfig}>
         <LineChart data={data} margin={{ top: 10, right: 40 }}>
           <Line dataKey={yKey} />
           <CartesianGrid />
-          <XAxis
-            dataKey={xKey}
-            tick={type === "day" ? (props) => renderTick(props, data, xKey) : undefined}
-            tickMargin={8}
-          />
+          <XAxis dataKey={xKey} tick={type === "day" ? tickRenderer : undefined} tickMargin={8} />
           <YAxis />
           <ChartTooltip
             cursor={{ fillOpacity: 0.4, stroke: "hsl(var(--primary))" }}
