@@ -103,7 +103,7 @@ function App() {
               });
             }}
           >
-            <SelectTrigger className="w-[120px] bg-white text-black">
+            <SelectTrigger className="w-[120px] bg-white text-black border-black hover:bg-gray-100 ">
               <SelectValue placeholder="Theme" />
             </SelectTrigger>
             <SelectContent>
@@ -118,7 +118,7 @@ function App() {
           <Checkbox
             checked={compareMode}
             onCheckedChange={(v) => setCompareMode(!!v)}
-            className="bg-white"
+            className="bg-white border-black hover:bg-gray-100"
           />
           <Label htmlFor="terms" className="text-base">
             2期間比較
