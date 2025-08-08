@@ -6,7 +6,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { AggregatedData } from "@/interfaces/aggregated-data.interface";
-import React from "react";
+import React, { useMemo } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
 type GraphProps = {
@@ -92,7 +92,7 @@ const Graph: React.FC<GraphProps> = ({
   theme,
 }) => {
   // 15日より多いデータ数の場合、日曜基準の目盛りを表示
-  const sundayTicks = React.useMemo(() => {
+  const sundayTicks = useMemo(() => {
     if (theme !== "day") return undefined;
     const uniqueDays = new Set(data.map((row) => String(row[xKey]))).size;
     if (uniqueDays <= 15) return undefined;
