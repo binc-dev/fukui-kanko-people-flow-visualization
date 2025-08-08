@@ -8,9 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getRawData } from "@/lib/data/csv";
 import { useEffect, useState } from "react";
-import { AggregatedData, TOTAL_COUNT_KEY } from "@fukui-kanko/shared";
+import { AggregatedData, getRawData, TOTAL_COUNT_KEY } from "@fukui-kanko/shared";
 import { formatDate } from "./lib/utils";
 
 function App() {
@@ -34,7 +33,11 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const rawData = await getRawData("Person");
+        const rawData = await getRawData({
+          objectClass: "Person",
+          placement: "fukui-station-east-entrance",
+          aggregateRange: "full",
+        });
         setCsvData(rawData);
       } catch (error) {
         // eslint-disable-next-line no-console
