@@ -91,6 +91,15 @@ const Graph: React.FC<GraphProps> = ({
   yKey = "total count",
   theme,
 }) => {
+  // 15日より多いデータ数の場合、日曜基準の目盛りを表示
+  const sundayTicks = React.useMemo(() => {
+    if (theme !== "day") return undefined;
+    const uniqueDays = new Set(data.map((row) => String(row[xKey]))).size;
+    if (uniqueDays <= 15) return undefined;
+    const ticks = data.filter((row) => row.dayOfWeek === "日").map((row) => String(row[xKey]));
+    return ticks;
+  }, [data, theme, xKey]);
+
   if (theme === "hour") {
     // 日付ごとにグループ化し、xKeyを時間のみに変換
     const grouped: { [date: string]: AggregatedData[] } = {};
@@ -147,6 +156,7 @@ const Graph: React.FC<GraphProps> = ({
             dataKey={xKey}
             tick={theme === "day" ? (props) => renderTick(props, data, xKey) : undefined}
             tickMargin={8}
+            ticks={sundayTicks}
           />
           <YAxis />
           <ChartTooltip
