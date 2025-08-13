@@ -49,14 +49,24 @@ export function useDailyDataEffect(
     const fetchData = async () => {
       if (period.startDate && period.endDate) {
         setIsLoading(true);
-        const rawData = await getRawData({
-          objectClass: "Person",
-          placement: "fukui-station-east-entrance",
-          aggregateRange: "hourly",
-          date: period.startDate,
-        });
+        const results: AggregatedData[] = [];
+        const current = new Date(period.startDate);
+        const end = new Date(period.endDate);
+
+        while (current <= end) {
+          // 1時間ごとに取得
+          const rawData = await getRawData({
+            objectClass: "Person",
+            placement: "fukui-station-east-entrance",
+            aggregateRange: "daily",
+            date: new Date(current),
+          });
+          results.push(...rawData);
+          current.setHours(current.getHours() + 1);
+        }
+
         if (isCurrent) {
-          setDailyData(rawData);
+          setDailyData(results);
           setIsLoading(false);
         }
       }
