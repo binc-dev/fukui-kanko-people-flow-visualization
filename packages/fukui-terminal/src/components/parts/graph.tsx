@@ -1,19 +1,19 @@
+import React, { useCallback, useMemo } from "react";
+import { AggregatedData } from "@fukui-kanko/shared";
 import {
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
-import { AggregatedData } from "@/interfaces/aggregated-data.interface";
-import React, { useMemo } from "react";
+} from "@fukui-kanko/shared/components/ui";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
 type GraphProps = {
   data: AggregatedData[];
   xKey?: string;
   yKey?: string;
-  theme: "month" | "week" | "day" | "hour";
+  type: "month" | "week" | "day" | "hour";
 };
 
 type XAxisTickProps = {
@@ -24,25 +24,18 @@ type XAxisTickProps = {
 };
 
 const chartConfig = {
-  "total count": { label: "人物検出回数" },
+  totalCount: { label: "人物検出回数" },
 };
-
-const lineColors = [
-  "#E05B53",
-  "#E063AA",
-  "#E59562",
-  "#E5C930",
-  "#61C558",
-  "#50AC6E",
-  "#57CBD4",
-  "#456DE1",
-  "#3248A9",
-  "#7E55E1",
-];
 
 function renderTick(props: XAxisTickProps, data: AggregatedData[], xKey: string) {
   const d = data.find((row) => row[xKey] === props.payload.value);
-  return <CustomizedXAxisTick {...props} dayOfWeek={d?.dayOfWeek} holidayName={d?.holidayName} />;
+  return (
+    <CustomizedXAxisTick
+      {...props}
+      dayOfWeek={d?.dayOfWeek !== undefined ? String(d.dayOfWeek) : undefined}
+      holidayName={d?.holidayName !== undefined ? String(d.holidayName) : undefined}
+    />
+  );
 }
 
 const CustomizedXAxisTick = ({
@@ -85,22 +78,40 @@ const CustomizedXAxisTick = ({
   );
 };
 
+const lineColors = [
+  "#E05B53",
+  "#E063AA",
+  "#E59562",
+  "#E5C930",
+  "#61C558",
+  "#50AC6E",
+  "#57CBD4",
+  "#456DE1",
+  "#3248A9",
+  "#7E55E1",
+];
+
 const Graph: React.FC<GraphProps> = ({
   data,
-  xKey = "aggregate from",
-  yKey = "total count",
-  theme,
+  xKey = "aggregateFrom",
+  yKey = "totalCount",
+  type,
 }) => {
   // 15日より多いデータ数の場合、日曜基準の目盛りを表示
   const sundayTicks = useMemo(() => {
-    if (theme !== "day") return undefined;
+    if (type !== "day") return undefined;
     const uniqueDays = new Set(data.map((row) => String(row[xKey]))).size;
     if (uniqueDays <= 15) return undefined;
     const ticks = data.filter((row) => row.dayOfWeek === "日").map((row) => String(row[xKey]));
     return ticks;
-  }, [data, theme, xKey]);
+  }, [data, type, xKey]);
 
-  if (theme === "hour") {
+  const tickRenderer = useCallback(
+    (props: XAxisTickProps) => renderTick(props, data, xKey),
+    [data, xKey],
+  );
+
+  if (type === "hour") {
     // 日付ごとにグループ化し、xKeyを時間のみに変換
     const grouped: { [date: string]: AggregatedData[] } = {};
     data.forEach((row) => {
@@ -145,8 +156,7 @@ const Graph: React.FC<GraphProps> = ({
       </ChartContainer>
     );
   }
-
-  if (theme === "month" || theme === "week" || theme === "day") {
+  if (type === "month" || type === "week" || type === "day") {
     return (
       <ChartContainer config={chartConfig} className="h-full w-full">
         <LineChart data={data} margin={{ top: 10, bottom: 10, right: 40 }}>
@@ -154,7 +164,7 @@ const Graph: React.FC<GraphProps> = ({
           <CartesianGrid />
           <XAxis
             dataKey={xKey}
-            tick={theme === "day" ? (props) => renderTick(props, data, xKey) : undefined}
+            tick={type === "day" ? tickRenderer : undefined}
             tickMargin={8}
             ticks={sundayTicks}
           />
@@ -167,6 +177,12 @@ const Graph: React.FC<GraphProps> = ({
       </ChartContainer>
     );
   }
+
+  return (
+    <div>
+      <p>このタイプ（{type}）のグラフは開発中です。</p>
+    </div>
+  );
 };
 
 export { Graph };
