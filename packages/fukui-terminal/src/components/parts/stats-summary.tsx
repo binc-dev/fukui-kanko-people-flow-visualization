@@ -1,6 +1,6 @@
 import { AverageBar } from "@/components/parts/average-bar";
-import { AggregatedData } from "@/interfaces/aggregated-data.interface";
 import React from "react";
+import { AggregatedData } from "@fukui-kanko/shared";
 import { PeopleIcon } from "@primer/octicons-react";
 
 type StatsSummaryProps = {

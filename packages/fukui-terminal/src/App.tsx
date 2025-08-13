@@ -2,7 +2,8 @@ import { Period } from "@/interfaces/period.interface";
 import { useDailyDataEffect, useFilteredData } from "@/lib/hooks/period-data-effects";
 import { useEffect, useState } from "react";
 import { getRawData } from "@fukui-kanko/shared";
-import { Checkbox, Label, Select } from "@fukui-kanko/shared/components/ui";
+import { TypeSelect } from "@fukui-kanko/shared/components/parts";
+import { Checkbox, Label } from "@fukui-kanko/shared/components/ui";
 import { AggregatedData } from "@fukui-kanko/shared/types";
 import { PeriodGraphPanel } from "./components/parts/period-graph-panel";
 
@@ -80,13 +81,11 @@ function App() {
     <div className="h-full w-full max-w-full text-center flex flex-col items-center gap-2 mt-3">
       <div className="flex flex-row items-center gap-17 mr-24">
         <div className="flex flex-row items-center gap-2">
-          <p>表示単位</p>
-          <Select
-            value={type}
-            onValueChange={(v) => {
-              const newType = v as "month" | "week" | "day" | "hour";
+          <TypeSelect
+            type={type}
+            onChange={(newType) => {
               setType(newType);
-              // テーマ変更時に値をリセット
+              // タイプ変更時に値をリセット
               setPeriod({
                 startDate: undefined,
                 endDate: undefined,
@@ -104,7 +103,7 @@ function App() {
                 endWeekRange: undefined,
               });
             }}
-          ></Select>
+          />
         </div>
         <div className="flex flex-row items-center gap-2">
           <Checkbox
@@ -119,7 +118,7 @@ function App() {
       </div>
       <div className="flex flex-col sm:flex-row w-full gap-8 justify-center">
         <PeriodGraphPanel
-          theme={type}
+          type={type}
           period={period}
           setPeriod={setPeriod}
           isCompareMode={compareMode}
@@ -129,7 +128,7 @@ function App() {
         />
         {compareMode && (
           <PeriodGraphPanel
-            theme={type}
+            type={type}
             period={comparePeriod}
             setPeriod={setComparePeriod}
             isCompareMode={compareMode}

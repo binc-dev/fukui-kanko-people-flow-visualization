@@ -1,8 +1,7 @@
-import { AggregatedData } from "@/interfaces/aggregated-data.interface";
 import { Period } from "@/interfaces/period.interface";
 import { getFilteredData } from "@/lib/aggregation";
-import { getDailyData } from "@/lib/data/csv";
 import { useEffect } from "react";
+import { AggregatedData, getRawData } from "@fukui-kanko/shared";
 
 /**
  * テーマ・期間ごとに適切な集計データを返すカスタムフック
@@ -50,7 +49,12 @@ export function useDailyDataEffect(
     const fetchData = async () => {
       if (period.startDate && period.endDate) {
         setIsLoading(true);
-        const rawData = await getDailyData("Person", period.startDate, period.endDate);
+        const rawData = await getRawData({
+          objectClass: "Person",
+          placement: "fukui-station-east-entrance",
+          aggregateRange: "hourly",
+          date: period.startDate,
+        });
         if (isCurrent) {
           setDailyData(rawData);
           setIsLoading(false);

@@ -1,4 +1,4 @@
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@fukui-kanko/shared/components/ui";
 import {
   DatabaseIcon,
   FileCodeIcon,
