@@ -4,7 +4,7 @@ import { AggregatedData } from "@fukui-kanko/shared";
 import { PeopleIcon } from "@primer/octicons-react";
 
 type StatsSummaryProps = {
-  theme: "month" | "week" | "day" | "hour";
+  type: "month" | "week" | "day" | "hour";
   data?: AggregatedData[];
 };
 
@@ -13,7 +13,7 @@ type StatsSummaryProps = {
  */
 function getStats(data: AggregatedData[]) {
   if (!data || data.length === 0) return { sum: 0, avg: 0 };
-  const sum = data.reduce((acc, cur) => acc + Number(cur["total count"] ?? 0), 0);
+  const sum = data.reduce((acc, cur) => acc + Number(cur["totalCount"] ?? 0), 0);
   const avg = sum / data.length;
   return { sum, avg };
 }
@@ -36,10 +36,10 @@ function getWeekdayAverages(data: AggregatedData[], theme: string) {
   }
   if (theme === "day") {
     const weekdays = data.filter(
-      (d) => d.dayOfWeek && !["土", "日"].includes(d.dayOfWeek) && !d.holidayName,
+      (d) => d.dayOfWeek && !["土", "日"].includes(String(d.dayOfWeek)) && !d.holidayName,
     );
     const weekends = data.filter(
-      (d) => (d.dayOfWeek && ["土", "日"].includes(d.dayOfWeek)) || d.holidayName,
+      (d) => (d.dayOfWeek && ["土", "日"].includes(String(d.dayOfWeek))) || d.holidayName,
     );
     const weekdayAvg =
       weekdays.length > 0
@@ -54,9 +54,9 @@ function getWeekdayAverages(data: AggregatedData[], theme: string) {
   return { weekdayAvg: 0, weekendAvg: 0 };
 }
 
-export const StatsSummary: React.FC<StatsSummaryProps> = ({ theme, data }) => {
+export const StatsSummary: React.FC<StatsSummaryProps> = ({ type, data }) => {
   const { sum, avg } = getStats(data ?? []);
-  const { weekdayAvg, weekendAvg } = getWeekdayAverages(data ?? [], theme);
+  const { weekdayAvg, weekendAvg } = getWeekdayAverages(data ?? [], type);
   const statsData = {
     sum: Math.round(sum),
     avg: Math.round(avg),
@@ -71,7 +71,7 @@ export const StatsSummary: React.FC<StatsSummaryProps> = ({ theme, data }) => {
     <div className="flex justify-center">
       <div
         className={`grid ${
-          theme === "hour" ? "md:grid-cols-[1fr_1fr]" : "md:grid-cols-[1fr_1.5fr]"
+          type === "hour" ? "md:grid-cols-[1fr_1fr]" : "md:grid-cols-[1fr_1.5fr]"
         } gap-3 mt-2 mb-4 w-full max-w-md`}
       >
         {/* 合計人数 */}
@@ -84,7 +84,7 @@ export const StatsSummary: React.FC<StatsSummaryProps> = ({ theme, data }) => {
         </div>
         {/* 平均人数 */}
         <div className="bg-green-50 rounded-lg p-2 text-center">
-          {theme !== "hour" ? (
+          {type !== "hour" ? (
             <>
               <AverageBar
                 color="bg-blue-500"
