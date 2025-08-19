@@ -1,49 +1,39 @@
 import { useEffect, useState } from "react";
-import { RangeSelector } from "@fukui-kanko/shared/components/parts";
+import { MonthRangePicker, RangeSelector } from "@fukui-kanko/shared/components/parts";
 import { ChartConfig, ChartContainer } from "@fukui-kanko/shared/components/ui";
-import { AggregatedData, ATTRIBUTES } from "@fukui-kanko/shared/types";
-import { cn, getMaxDate } from "@fukui-kanko/shared/utils";
+import { AggregatedData, ATTRIBUTES, GRAPH_VIEW_TYPES, Period } from "@fukui-kanko/shared/types";
+import { cn } from "@fukui-kanko/shared/utils";
 import { CartesianGrid, ComposedChart, XAxis, YAxis } from "recharts";
 import { createStackedBarChartData } from "../../utils/utils";
 import RainbowLineStackedBarChart, { StackedBarChartData } from "./rainbow-line-stacked-bar-chart";
 
-export function RainbowLineChartPanel({
-  data,
-  className,
-}: {
-  data: AggregatedData[];
+type RainbowLineChartPanelProps = {
+  type: keyof typeof GRAPH_VIEW_TYPES;
+  period: Period;
+  setPeriod: React.Dispatch<React.SetStateAction<Period>>;
+  filteredData: AggregatedData[];
   className?: string;
-}) {
+};
+
+export function RainbowLineChartPanel({
+  type,
+  period,
+  setPeriod,
+  filteredData,
+  className,
+}: RainbowLineChartPanelProps) {
   const [chartConfig] = useState<ChartConfig>({
     "total count": {
       label: "ナンバープレート検出回数",
     },
   });
 
-  const [graphRange, setGraphRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
-    from: new Date("2025-08-01"),
-    to: getMaxDate(),
-  });
-  const [dataInRange, setDataInRange] = useState<AggregatedData[]>([]);
   const [stackedBarChartData, setStackedBarChartData] = useState<StackedBarChartData[]>([]);
   const [prefectureStackedBarChartData, setPrefectureStackedBarChartData] = useState<
     StackedBarChartData[]
   >([]);
 
   useEffect(() => {
-    const filteredData = data.filter((row) => {
-      const aggregatedFrom = new Date(row["aggregate from"]);
-      return (
-        aggregatedFrom >= (graphRange.from || new Date(0)) &&
-        aggregatedFrom < (graphRange.to || new Date())
-      );
-    });
-
-    setDataInRange(filteredData);
-
     // 積み上げ棒グラフ用のデータを作成（車種カテゴリー別）
     const chartData = createStackedBarChartData(filteredData, "carCategories");
     setStackedBarChartData(chartData);
@@ -51,7 +41,7 @@ export function RainbowLineChartPanel({
     // 積み上げ棒グラフ用のデータを作成（都道府県別）
     const prefectureChartData = createStackedBarChartData(filteredData, "prefectures");
     setPrefectureStackedBarChartData(prefectureChartData);
-  }, [data, graphRange]);
+  }, [filteredData, type, period]);
 
   return (
     <div
@@ -60,13 +50,35 @@ export function RainbowLineChartPanel({
         className,
       )}
     >
-      <RangeSelector
-        type={"date"}
-        start={graphRange.from}
-        end={graphRange.to}
-        setStart={(d) => setGraphRange({ ...graphRange, from: d })}
-        setEnd={(d) => setGraphRange({ ...graphRange, to: d })}
-      ></RangeSelector>
+      {type === "month" && (
+        <MonthRangePicker
+          startMonth={period.startMonth}
+          endMonth={period.endMonth}
+          onChange={(start, end) => {
+            setPeriod((prev) => ({ ...prev, startMonth: start, endMonth: end }));
+          }}
+        />
+      )}
+
+      {type === "week" && (
+        <RangeSelector
+          type="week"
+          start={period.startWeekRange}
+          end={period.endWeekRange}
+          setStart={(range) => setPeriod((prev) => ({ ...prev, startWeekRange: range }))}
+          setEnd={(range) => setPeriod((prev) => ({ ...prev, endWeekRange: range }))}
+        />
+      )}
+
+      {(type === "day" || type === "hour") && (
+        <RangeSelector
+          type="date"
+          start={period.startDate}
+          end={period.endDate}
+          setStart={(date) => setPeriod((prev) => ({ ...prev, startDate: date }))}
+          setEnd={(date) => setPeriod((prev) => ({ ...prev, endDate: date }))}
+        />
+      )}
 
       <div className="flex gap-x-4 w-full min-w-full grow overflow-auto">
         <div className="flex-1">
@@ -80,7 +92,7 @@ export function RainbowLineChartPanel({
                 tick={{ fontSize: 12 }}
                 height={50}
                 interval={0}
-                tickCount={dataInRange.length > 10 ? 10 : dataInRange.length}
+                tickCount={filteredData.length > 10 ? 10 : filteredData.length}
               />
               <YAxis dataKey={"total count"} tickLine={true} allowDecimals={false} />
             </ComposedChart>
@@ -90,6 +102,7 @@ export function RainbowLineChartPanel({
         <div className="flex-1">
           <h3 className="text-lg font-semibold mb-2 text-center">車両分類</h3>
           <RainbowLineStackedBarChart
+            type={type}
             data={stackedBarChartData}
             keys={Object.values(ATTRIBUTES.carCategories)}
             colors={["#8884d8", "#82ca9d", "#ffc658", "#ff8042"]}
@@ -99,6 +112,7 @@ export function RainbowLineChartPanel({
         <div className="flex-1">
           <h3 className="text-lg font-semibold mb-2 text-center">都道府県</h3>
           <RainbowLineStackedBarChart
+            type={type}
             data={prefectureStackedBarChartData}
             keys={Object.values(ATTRIBUTES.prefectures)}
             colors={[

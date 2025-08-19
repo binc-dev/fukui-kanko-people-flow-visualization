@@ -5,9 +5,11 @@ import {
   CAR_CATEGORIES,
   getRawData,
   GRAPH_VIEW_TYPES,
+  Period,
   Placement,
   PREFECTURES,
   REGIONS_PREFECTURES,
+  useFilteredData,
   useInitialization,
 } from "@fukui-kanko/shared";
 import { TypeSelect } from "@fukui-kanko/shared/components/parts";
@@ -35,8 +37,54 @@ function App() {
   const [type, setType] = useState<keyof typeof GRAPH_VIEW_TYPES>("month");
   const [compareMode, setCompareMode] = useState(false);
 
-  const [data, setData] = useState<AggregatedData[]>([]);
+  // 本期間の状態
+  const [period, setPeriod] = useState<Period>({
+    startDate: undefined,
+    endDate: undefined,
+    startMonth: undefined,
+    endMonth: undefined,
+    startWeekRange: undefined,
+    endWeekRange: undefined,
+  });
+
+  // 比較期間の状態
+  const [comparePeriod, setComparePeriod] = useState<Period>({
+    startDate: undefined,
+    endDate: undefined,
+    startMonth: undefined,
+    endMonth: undefined,
+    startWeekRange: undefined,
+    endWeekRange: undefined,
+  });
+
+  const [csvData, setCsvData] = useState<AggregatedData[]>([]);
   const [processedData, setProcessedData] = useState<RainbowLineAggregatedData[]>([]);
+
+  // 期間別集計データの状態
+  const [filteredData, setFilteredData] = useState<AggregatedData[]>([]);
+
+  // 比較期間用の期間別集計データの状態
+  const [compareFilteredData, setCompareFilteredData] = useState<AggregatedData[]>([]);
+
+  // sharedのuseFilteredDataフックを使用して期間別集計データを取得
+  useFilteredData(
+    type,
+    period,
+    processedData as AggregatedData[],
+    [], // 時間別データは現在使用していない
+    setFilteredData,
+    () => {}, // 時間別データのsetterは空の関数
+  );
+
+  // 比較期間用のフックも追加
+  useFilteredData(
+    type,
+    comparePeriod,
+    processedData as AggregatedData[],
+    [], // 時間別データは現在使用していない
+    setCompareFilteredData,
+    () => {}, // 時間別データのsetterは空の関数
+  );
 
   useInitialization(() => {
     Promise.all([
@@ -51,13 +99,13 @@ function App() {
         aggregateRange: "full",
       }),
     ]).then(([firstLot, secondLot]) => {
-      setData([...firstLot, ...secondLot]);
+      setCsvData([...firstLot, ...secondLot]);
     });
   });
 
   useEffect(() => {
     const processedAggregatedFrom = new Set<string>();
-    const processed = data
+    const processed = csvData
       // 駐車場のフィルタが設定されていれば適用
       .filter((row) => {
         if (filters["parkingLot"] === "all") return true;
@@ -146,7 +194,7 @@ function App() {
         return filteredRow;
       });
     setProcessedData(processed);
-  }, [data, filters]);
+  }, [csvData, filters]);
 
   return (
     <div className="flex flex-col w-full h-[100dvh] p-4 overflow-hidden">
@@ -157,7 +205,30 @@ function App() {
           defaultValues={filters}
           onFilterChange={(k, v) => setFilters({ ...filters, [`${k}`]: v })}
         />
-        <TypeSelect className="self-end" type={type} onChange={setType} />
+        <TypeSelect
+          className="self-end"
+          type={type}
+          onChange={(newType) => {
+            setType(newType);
+            // タイプ変更時に値をリセット
+            setPeriod({
+              startDate: undefined,
+              endDate: undefined,
+              startMonth: undefined,
+              endMonth: undefined,
+              startWeekRange: undefined,
+              endWeekRange: undefined,
+            });
+            setComparePeriod({
+              startDate: undefined,
+              endDate: undefined,
+              startMonth: undefined,
+              endMonth: undefined,
+              startWeekRange: undefined,
+              endWeekRange: undefined,
+            });
+          }}
+        />
         <div className="flex items-center gap-2 h-fit">
           <Checkbox
             checked={compareMode}
@@ -171,8 +242,20 @@ function App() {
         </div>
       </div>
       <div className="flex items-center gap-x-4 grow w-full h-full max-h-full py-4">
-        <RainbowLineChartPanel data={processedData as AggregatedData[]} />
-        {compareMode && <RainbowLineChartPanel data={processedData as AggregatedData[]} />}
+        <RainbowLineChartPanel
+          type={type}
+          period={period}
+          setPeriod={setPeriod}
+          filteredData={filteredData}
+        />
+        {compareMode && (
+          <RainbowLineChartPanel
+            type={type}
+            period={comparePeriod}
+            setPeriod={setComparePeriod}
+            filteredData={compareFilteredData}
+          />
+        )}
       </div>
     </div>
   );
