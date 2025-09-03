@@ -1,3 +1,4 @@
+import { useEffect, useState, useTransition } from "react";
 import {
   type AggregatedData,
   ATTRIBUTES,
@@ -5,6 +6,7 @@ import {
   cn,
   type ObjectClassAttribute,
 } from "@fukui-kanko/shared";
+import { LoadingSpinner } from "@fukui-kanko/shared/components/parts";
 import {
   ChartConfig,
   ChartContainer,
@@ -70,66 +72,79 @@ export function RainbowLinePieChart({
   focusedAttribute: ObjectClassAttribute;
   className?: string;
 }) {
-  const list = ATTRIBUTES[focusedAttribute];
-  const aggregatedData = data.map((row) => {
-    const newData: Record<string, string | number> = {
-      "aggregate from": row["aggregate from"],
-    };
-    Object.keys(list)
-      .map((listitem) => ({
-        [`${listitem}`]: Object.keys(row)
-          .filter(
-            (key) =>
-              (focusedAttribute === "prefectures" && key.startsWith(listitem)) ||
-              (focusedAttribute === "carCategories" && key.endsWith(listitem)),
-          )
-          .map((key) => Number(row[key]))
-          .reduce((sum, current) => sum + current, 0),
-      }))
-      .forEach((item) => {
-        newData[Object.keys(item)[0]] = item[Object.keys(item)[0]];
-      });
-    return {
-      ...newData,
-    };
-  });
-  let chartData = aggregatedData
-    .reduce(
-      (acc, row) => {
-        Object.entries(row).forEach(([key, value]) => {
-          if (key === "aggregate from") return; // Skip the date key
-          const index = acc.findIndex((item) => item.name === key);
-          if (index === -1) {
-            acc.push({ value: Number(value), name: key });
-            return;
-          } else {
-            acc[index].value = Number(acc[index].value) + Number(value);
-          }
-        });
-        return acc;
-      },
-      [] as Record<string, string | number>[],
-    )
-    .sort((a, b) => {
-      if (typeof a.value === "number" && typeof b.value === "number") {
-        return b.value - a.value; // Sort by value in descending order
-      }
-      return 0; // If not numbers, keep original order
-    });
-  chartData = [
-    ...chartData.filter((data) => data.name !== "Other"),
-    { name: "Other", value: chartData.find((data) => data.name === "Other")?.value ?? 0 },
-  ];
-  const chartConfig: ChartConfig = {};
-  Object.keys(list).forEach((key) => {
-    chartConfig[key] = {
-      label: attributeValueText(focusedAttribute, key),
-    };
-  });
-
+  const [isPending, startTransition] = useTransition();
+  const [chartData, setChartData] = useState<Record<string, string | number>[]>([]);
+  const [chartConfig, setChartConfig] = useState<ChartConfig>({});
   const colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#8dd1e1"];
 
-  return (
+  useEffect(
+    () =>
+      startTransition(() => {
+        const list = ATTRIBUTES[focusedAttribute];
+        const aggregatedData = data.map((row) => {
+          const newData: Record<string, string | number> = {
+            "aggregate from": row["aggregate from"],
+          };
+          Object.keys(list)
+            .map((listitem) => ({
+              [`${listitem}`]: Object.keys(row)
+                .filter(
+                  (key) =>
+                    (focusedAttribute === "prefectures" && key.startsWith(listitem)) ||
+                    (focusedAttribute === "carCategories" && key.endsWith(listitem)),
+                )
+                .map((key) => Number(row[key]))
+                .reduce((sum, current) => sum + current, 0),
+            }))
+            .forEach((item) => {
+              newData[Object.keys(item)[0]] = item[Object.keys(item)[0]];
+            });
+          return {
+            ...newData,
+          };
+        });
+        let chartData = aggregatedData
+          .reduce(
+            (acc, row) => {
+              Object.entries(row).forEach(([key, value]) => {
+                if (key === "aggregate from") return; // Skip the date key
+                const index = acc.findIndex((item) => item.name === key);
+                if (index === -1) {
+                  acc.push({ value: Number(value), name: key });
+                  return;
+                } else {
+                  acc[index].value = Number(acc[index].value) + Number(value);
+                }
+              });
+              return acc;
+            },
+            [] as Record<string, string | number>[],
+          )
+          .sort((a, b) => {
+            if (typeof a.value === "number" && typeof b.value === "number") {
+              return b.value - a.value; // Sort by value in descending order
+            }
+            return 0; // If not numbers, keep original order
+          });
+        chartData = [
+          ...chartData.filter((data) => data.name !== "Other"),
+          { name: "Other", value: chartData.find((data) => data.name === "Other")?.value ?? 0 },
+        ];
+        const chartConfig: ChartConfig = {};
+        Object.keys(list).forEach((key) => {
+          chartConfig[key] = {
+            label: attributeValueText(focusedAttribute, key),
+          };
+        });
+        setChartData(chartData);
+        setChartConfig(chartConfig);
+      }),
+    [data, focusedAttribute],
+  );
+
+  return isPending ? (
+    <LoadingSpinner />
+  ) : (
     <ChartContainer config={chartConfig} className={cn("h-full w-full", className)}>
       <PieChart>
         <Pie

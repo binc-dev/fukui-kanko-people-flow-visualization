@@ -1,6 +1,8 @@
+import { useEffect, useState, useTransition } from "react";
 import {
   DownloadCSVButton,
   Graph,
+  LoadingSpinner,
   MonthRangePicker,
   RangeSelector,
   StatsSummary,
@@ -29,32 +31,44 @@ export function RainbowLineChartPanel({
   statsDataMonthWeek: AggregatedData[];
   className?: string;
 }) {
-  const dataInRange = data.filter((row) => {
-    const aggregatedFrom = new Date(row["aggregate from"]);
-    // 月表示の場合は月単位での比較を行う（日付は無視）
-    if (type === "month" && period.startMonth && period.endMonth) {
-      const rowDate = new Date(aggregatedFrom.getFullYear(), aggregatedFrom.getMonth(), 1);
-      const startDate = new Date(period.startMonth.getFullYear(), period.startMonth.getMonth(), 1);
-      const endDate = new Date(period.endMonth.getFullYear(), period.endMonth.getMonth(), 1);
-      return rowDate >= startDate && rowDate <= endDate;
-    }
-    return (
-      aggregatedFrom >=
-        (type === "week"
-          ? period.startWeekRange?.from || new Date(0)
-          : period.startDate || new Date(0)) &&
-      aggregatedFrom <=
-        (type === "week" ? period.endWeekRange?.to || new Date(0) : period.endDate || new Date(0))
-    );
-  });
+  const [isPending, startTransition] = useTransition();
+  const [dataInRange, setDataInRange] = useState<AggregatedData[]>([]);
+  const [statsDataHourDay, setStatsDataHourDay] = useState<AggregatedData[]>([]);
 
-  // 「hour」「day」の時のみ利用する統計値用データ
-  const statsDataHourDay: AggregatedData[] =
-    type === "hour"
-      ? (aggregateHourly(dailyData) ?? [])
-      : type === "day" && period.startDate && period.endDate
-        ? (aggregateDaily(data, period.startDate, period.endDate) ?? [])
-        : [];
+  useEffect(
+    () =>
+      startTransition(() => {
+        setDataInRange(
+          data.filter((row) => {
+            const aggregatedFrom = new Date(row["aggregate from"]);
+            return (
+              aggregatedFrom >=
+                (type === "week"
+                  ? period.startWeekRange?.from || new Date(0)
+                  : type === "month"
+                    ? period.startMonth || new Date(0)
+                    : period.startDate || new Date(0)) &&
+              aggregatedFrom <=
+                (type === "week"
+                  ? period.endWeekRange?.to || new Date(0)
+                  : type === "month"
+                    ? period.endMonth || new Date(0)
+                    : period.endDate || new Date(0))
+            );
+          }),
+        );
+
+        // 「hour」「day」の時のみ利用する統計値用データ
+        setStatsDataHourDay(
+          type === "hour"
+            ? (aggregateHourly(dailyData) ?? [])
+            : type === "day" && period.startDate && period.endDate
+              ? (aggregateDaily(data, period.startDate, period.endDate) ?? [])
+              : [],
+        );
+      }),
+    [type, period, data, dailyData],
+  );
 
   return (
     <div
@@ -120,7 +134,9 @@ export function RainbowLineChartPanel({
             isCompareMode ? "flex flex-col" : "grid grid-cols-2",
           )}
         >
-          {type === "hour" ? (
+          {isPending ? (
+            <LoadingSpinner />
+          ) : type === "hour" ? (
             <Graph
               data={aggregateHourly(dailyData)}
               type={type}

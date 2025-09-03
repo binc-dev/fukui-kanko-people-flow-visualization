@@ -1,7 +1,7 @@
 import { RAINBOW_LINE_LOTS } from "@/constants/parking-lots";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { cn, formatDate, WEEK_DAYS } from "@fukui-kanko/shared";
-import { renderTick, XAxisTickProps } from "@fukui-kanko/shared/components/parts";
+import { LoadingSpinner, renderTick, XAxisTickProps } from "@fukui-kanko/shared/components/parts";
 import {
   ChartContainer,
   ChartLegend,
@@ -110,12 +110,17 @@ export const RainbowLineStackedBarChart: React.FC<RainbowLineStackedBarChartProp
   type,
   className,
 }) => {
+  const [isPending, startTransition] = useTransition();
   const [chartData, setChartData] = useState<AggregatedData[]>([]);
 
-  useEffect(() => {
-    const dailyData = aggregateDaily(data, focusedAttribute, type);
-    setChartData(dailyData);
-  }, [data, focusedAttribute, type]);
+  useEffect(
+    () =>
+      startTransition(() => {
+        const dailyData = aggregateDaily(data, focusedAttribute, type);
+        setChartData(dailyData);
+      }),
+    [data, focusedAttribute, type],
+  );
 
   const tickRenderer = useCallback(
     (props: XAxisTickProps) => renderTick(props, chartData, "aggregateFrom"),
@@ -135,7 +140,9 @@ export const RainbowLineStackedBarChart: React.FC<RainbowLineStackedBarChartProp
 
   const colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#8dd1e1"];
 
-  return (
+  return isPending ? (
+    <LoadingSpinner />
+  ) : (
     <ChartContainer config={chartConfig} className={cn("h-full w-full", className)}>
       <BarChart data={chartData} margin={{ top: 10, right: 40, left: 20, bottom: 10 }}>
         <CartesianGrid vertical={false} />

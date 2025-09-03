@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import {
   AggregatedData,
   AggregatedDataBase,
@@ -17,7 +17,7 @@ import {
   useInitialization,
   useLotDailyData,
 } from "@fukui-kanko/shared";
-import { TypeSelect } from "@fukui-kanko/shared/components/parts";
+import { LoadingSpinner, TypeSelect } from "@fukui-kanko/shared/components/parts";
 import { Checkbox, Label } from "@fukui-kanko/shared/components/ui";
 import { Filters } from "./components/parts/filters";
 import { Header } from "./components/parts/header";
@@ -48,6 +48,7 @@ const compansateProcessedData = (
 });
 
 function App() {
+  const [isPending, startTransition] = useTransition();
   const [filters, _setFilters] = useState<
     Record<
       (typeof FILTER_ATTRIBUTES)[number]["id"],
@@ -284,21 +285,25 @@ function App() {
 
   // 元データから期間ごとの加工
   useEffect(() => {
-    const baseRows = dataLot1.reduce<AggregatedData[]>(
-      (result, current, index, parent) =>
-        reduceAggregateRange(type, [result, current, index, parent]),
-      [],
-    );
-    setProcessedDataLot1(processRows(baseRows));
+    startTransition(() => {
+      const baseRows = dataLot1.reduce<AggregatedData[]>(
+        (result, current, index, parent) =>
+          reduceAggregateRange(type, [result, current, index, parent]),
+        [],
+      );
+      setProcessedDataLot1(processRows(baseRows));
+    });
   }, [dataLot1, type, processRows]);
 
   useEffect(() => {
-    const baseRows = dataLot2.reduce<AggregatedData[]>(
-      (result, current, index, parent) =>
-        reduceAggregateRange(type, [result, current, index, parent]),
-      [],
-    );
-    setProcessedDataLot2(processRows(baseRows));
+    startTransition(() => {
+      const baseRows = dataLot2.reduce<AggregatedData[]>(
+        (result, current, index, parent) =>
+          reduceAggregateRange(type, [result, current, index, parent]),
+        [],
+      );
+      setProcessedDataLot2(processRows(baseRows));
+    });
   }, [dataLot2, type, processRows]);
 
   return (
@@ -320,27 +325,34 @@ function App() {
         </div>
       </div>
       <div className="flex items-center gap-x-4 grow w-full h-full overflow-hidden py-4">
-        {hasData && (
-          <RainbowLineChartPanel
-            type={type}
-            period={period}
-            setPeriod={setPeriod}
-            isCompareMode={compareMode}
-            data={targetData as AggregatedData[]}
-            dailyData={targetDailyData as AggregatedData[]}
-            statsDataMonthWeek={targetStatsData as AggregatedData[]}
-          />
-        )}
-        {compareMode && hasData && (
-          <RainbowLineChartPanel
-            type={type}
-            period={comparePeriod}
-            isCompareMode={compareMode}
-            setPeriod={setComparePeriod}
-            data={targetData as AggregatedData[]}
-            dailyData={targetDailyDataCompare as AggregatedData[]}
-            statsDataMonthWeek={targetStatsDataCompare as AggregatedData[]}
-          />
+        {hasData && !isPending ? (
+          !compareMode ? (
+            <RainbowLineChartPanel
+              type={type}
+              period={period}
+              setPeriod={setPeriod}
+              isCompareMode={compareMode}
+              data={targetData as AggregatedData[]}
+              dailyData={targetDailyData as AggregatedData[]}
+              statsDataMonthWeek={targetStatsData as AggregatedData[]}
+            />
+          ) : (
+            compareMode && (
+              <RainbowLineChartPanel
+                type={type}
+                period={comparePeriod}
+                isCompareMode={compareMode}
+                setPeriod={setComparePeriod}
+                data={targetData as AggregatedData[]}
+                dailyData={targetDailyDataCompare as AggregatedData[]}
+                statsDataMonthWeek={targetStatsDataCompare as AggregatedData[]}
+              />
+            )
+          )
+        ) : (
+          <div className="grid place-items-center w-full h-full">
+            <LoadingSpinner />
+          </div>
         )}
       </div>
     </div>
