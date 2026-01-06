@@ -23,6 +23,7 @@ import { Filters } from "./components/parts/filters";
 import { RainbowLineChartPanel } from "./components/parts/rainbow-line-chart-panel";
 import { RAINBOW_LINE_LOTS } from "./constants/parking-lots";
 import { FILTER_ATTRIBUTES } from "./interfaces/filter-attributes";
+import { sortByDate } from "./utils/sortByDate";
 
 type RainbowLineAggregatedData = AggregatedDataBase<Placement | "rainbow-line-all"> &
   Record<string, string | number>;
@@ -173,12 +174,6 @@ function App() {
     setStatsDataLot2Compare(filtered2Compare);
   }, [getStatsDataForPeriod, period, comparePeriod]);
 
-  const sortByDate = useCallback(<T extends RainbowLineAggregatedData>(data: T[]): T[] => {
-    return [...data].sort(
-      (a, b) => new Date(a["aggregate from"]).getTime() - new Date(b["aggregate from"]).getTime(),
-    );
-  }, []);
-
   const aggregateParkingLotData = useCallback(
     (lot1: RainbowLineAggregatedData[], lot2: RainbowLineAggregatedData[]) => {
       const selected = filters["parkingLot"];
@@ -221,7 +216,7 @@ function App() {
         return sortByDate(result);
       }
     },
-    [filters, sortByDate],
+    [filters],
   );
 
   const processRows = useCallback(

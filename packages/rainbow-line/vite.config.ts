@@ -24,4 +24,10 @@ export default defineConfig({
           : `${process.env.INTERNAL_ROOT}/data/`, // 社内確認環境
     ),
   },
+  // @ts-expect-error - Vitest configuration
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./src/test/setup.ts",
+  },
 });
