@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -24,7 +25,6 @@ export default defineConfig({
           : `${process.env.INTERNAL_ROOT}/data/`, // 社内確認環境
     ),
   },
-  // @ts-expect-error - Vitest configuration
   test: {
     globals: true,
     environment: "jsdom",

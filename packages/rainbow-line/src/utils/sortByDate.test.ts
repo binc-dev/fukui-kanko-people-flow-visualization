@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { AggregatedDataBase } from "@fukui-kanko/shared";
-import { describe, it, expect } from "vitest";
+import type { AggregatedDataBase } from "@fukui-kanko/shared";
+import { describe, expect, it } from "vitest";
 import { sortByDate } from "./sortByDate";
 
-type TestData = AggregatedDataBase & {
+type TestData = AggregatedDataBase<"rainbow-line-parking-lot-1-gate"> & {
   id: number;
 };
 
@@ -14,7 +13,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-03-15",
           "aggregate to": "2024-03-15",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 100,
           id: 1,
@@ -22,7 +21,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 50,
           id: 2,
@@ -30,7 +29,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-02-20",
           "aggregate to": "2024-02-20",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 75,
           id: 3,
@@ -49,7 +48,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 100,
           id: 1,
@@ -57,7 +56,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 50,
           id: 2,
@@ -76,7 +75,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10T15:00:00",
           "aggregate to": "2024-01-10T15:59:59",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 100,
           id: 1,
@@ -84,7 +83,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10T10:00:00",
           "aggregate to": "2024-01-10T10:59:59",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 50,
           id: 2,
@@ -92,7 +91,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10T12:00:00",
           "aggregate to": "2024-01-10T12:59:59",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 75,
           id: 3,
@@ -130,7 +129,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 100,
           id: 1,
@@ -150,7 +149,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 100,
           id: 1,
@@ -158,7 +157,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "invalid-date",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 50,
           id: 2,
@@ -166,7 +165,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-02-20",
           "aggregate to": "2024-02-20",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 75,
           id: 3,
@@ -196,7 +195,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 100,
           id: 1,
@@ -204,7 +203,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 50,
           id: 2,
@@ -224,7 +223,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-03-15",
           "aggregate to": "2024-03-15",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 100,
           id: 1,
@@ -232,7 +231,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 50,
           id: 2,
@@ -250,7 +249,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 100,
           id: 1,
@@ -269,7 +268,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 100,
           id: 1,
@@ -277,7 +276,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-02-20",
           "aggregate to": "2024-02-20",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 50,
           id: 2,
@@ -285,7 +284,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-03-15",
           "aggregate to": "2024-03-15",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 75,
           id: 3,
@@ -306,7 +305,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-03-15",
           "aggregate to": "2024-03-15",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 100,
           id: 1,
@@ -314,7 +313,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-02-20",
           "aggregate to": "2024-02-20",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 50,
           id: 2,
@@ -322,7 +321,7 @@ describe("sortByDate", () => {
         {
           "aggregate from": "2024-01-10",
           "aggregate to": "2024-01-10",
-          placement: "test-placement" as any,
+          placement: "rainbow-line-parking-lot-1-gate",
           "object class": "Person",
           "total count": 75,
           id: 3,
